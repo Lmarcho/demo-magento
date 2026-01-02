@@ -1,0 +1,83 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Lmarcho RagSync Module - Default Configuration Values
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <rag_sync>
+            <!-- General Settings -->
+            <general>
+                <enabled>0</enabled>
+                <environment>production</environment>
+                <debug>0</debug>
+                <log_retention_days>30</log_retention_days>
+            </general>
+
+            <!-- Connection Settings -->
+            <connection>
+                <webhook_url></webhook_url>
+                <tenant_id></tenant_id>
+                <api_secret backend_model="Magento\Config\Model\Config\Backend\Encrypted"/>
+                <timeout>30</timeout>
+            </connection>
+
+            <!-- Products Settings -->
+            <products>
+                <enabled>1</enabled>
+                <include_disabled>0</include_disabled>
+                <include_not_visible>0</include_not_visible>
+                <sync_attributes>brand,color,size,material</sync_attributes>
+                <exclude_categories>2</exclude_categories>
+            </products>
+
+            <!-- CMS Pages Settings -->
+            <cms_pages>
+                <enabled>1</enabled>
+                <sync_mode>whitelist</sync_mode>
+                <identifiers>privacy-policy,returns,shipping,faq,about,contact</identifiers>
+                <exclude_identifiers>no-route,home,enable-cookies</exclude_identifiers>
+            </cms_pages>
+
+            <!-- CMS Blocks Settings -->
+            <cms_blocks>
+                <enabled>1</enabled>
+                <identifiers>footer-info,store-hours,warranty-info</identifiers>
+            </cms_blocks>
+
+            <!-- Categories Settings -->
+            <categories>
+                <enabled>1</enabled>
+                <min_level>2</min_level>
+                <include_inactive>0</include_inactive>
+                <include_product_count>1</include_product_count>
+            </categories>
+
+            <!-- Promotions Settings -->
+            <promotions>
+                <enabled>1</enabled>
+                <rule_types>both</rule_types>
+                <include_inactive>0</include_inactive>
+                <include_expired>0</include_expired>
+            </promotions>
+
+            <!-- Queue Settings -->
+            <queue>
+                <batch_size>50</batch_size>
+                <max_retries>3</max_retries>
+                <retry_delays>5,15,60</retry_delays>
+                <cleanup_days>7</cleanup_days>
+            </queue>
+
+            <!-- Full Sync Schedule (cron expressions) -->
+            <schedule>
+                <products_cron>0 2 * * *</products_cron>
+                <cms_cron>30 2 * * *</cms_cron>
+                <categories_cron>0 3 * * *</categories_cron>
+                <promotions_cron>0 * * * *</promotions_cron>
+            </schedule>
+        </rag_sync>
+    </default>
+</config>

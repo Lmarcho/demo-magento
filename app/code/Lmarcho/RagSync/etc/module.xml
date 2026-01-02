@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Lmarcho RagSync Module
+ *
+ * Module declaration and dependencies
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Module/etc/module.xsd">
+    <module name="Lmarcho_RagSync" setup_version="1.0.0">
+        <sequence>
+            <module name="Magento_Catalog"/>
+            <module name="Magento_Cms"/>
+            <module name="Magento_SalesRule"/>
+            <module name="Magento_CatalogRule"/>
+            <module name="Magento_Cron"/>
+        </sequence>
+    </module>
+</config>

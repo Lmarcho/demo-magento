@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * Lmarcho RagSync Module - PHPUnit Configuration
+ */
+-->
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
+         colors="true"
+         bootstrap="bootstrap.php">
+
+    <testsuites>
+        <testsuite name="RagSync Unit Tests">
+            <directory>Unit</directory>
+        </testsuite>
+        <testsuite name="RagSync Integration Tests">
+            <directory>Integration</directory>
+        </testsuite>
+    </testsuites>
+
+    <coverage processUncoveredFiles="true">
+        <include>
+            <directory suffix=".php">../Model</directory>
+            <directory suffix=".php">../Observer</directory>
+            <directory suffix=".php">../Cron</directory>
+            <directory suffix=".php">../Console</directory>
+            <directory suffix=".php">../Controller</directory>
+            <directory suffix=".php">../Block</directory>
+        </include>
+        <exclude>
+            <directory suffix=".php">../Test</directory>
+        </exclude>
+        <report>
+            <html outputDirectory="coverage-report"/>
+            <text outputFile="coverage.txt"/>
+        </report>
+    </coverage>
+
+    <php>
+        <ini name="memory_limit" value="-1"/>
+        <ini name="date.timezone" value="UTC"/>
+    </php>
+
+    <logging>
+        <junit outputFile="test-results.xml"/>
+    </logging>
+</phpunit>

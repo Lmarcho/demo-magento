@@ -1,0 +1,206 @@
+<?php
+/**
+ * Lmarcho RagSync Module - Dashboard Template
+ *
+ * @var \Lmarcho\RagSync\Block\Adminhtml\Dashboard $block
+ */
+
+$isEnabled = $block->isEnabled();
+$isConfigured = $block->isConnectionConfigured();
+$queueStats = $block->getQueueStats();
+$entityStatus = $block->getEntitySyncStatus();
+$circuitStatus = $block->getCircuitBreakerStatus();
+?>
+
+<div class="ragsync-dashboard" id="ragsync-dashboard">
+    <!-- Header -->
+    <div class="dashboard-header">
+        <h1><?= $block->escapeHtml(__('RAG Sync Dashboard')) ?></h1>
+        <div class="header-actions">
+            <span class="environment-badge <?= $block->escapeHtmlAttr(strtolower($block->getEnvironment())) ?>">
+                <?= $block->escapeHtml($block->getEnvironment()) ?>
+            </span>
+            <?php if ($block->isDebugEnabled()): ?>
+                <span class="debug-badge">Debug Mode</span>
+            <?php endif; ?>
+            <a href="<?= $block->escapeUrl($block->getConfigUrl()) ?>" class="action-default">
+                <span><?= $block->escapeHtml(__('Configuration')) ?></span>
+            </a>
+        </div>
+    </div>
+
+    <?php if (!$isEnabled): ?>
+        <div class="message message-warning">
+            <span><?= $block->escapeHtml(__('RAG Sync module is disabled. Enable it in configuration to start syncing.')) ?></span>
+        </div>
+    <?php elseif (!$isConfigured): ?>
+        <div class="message message-warning">
+            <span><?= $block->escapeHtml(__('Connection not configured. Please configure the webhook URL, tenant ID, and API secret.')) ?></span>
+            <a href="<?= $block->escapeUrl($block->getConfigUrl()) ?>"><?= $block->escapeHtml(__('Go to Configuration')) ?></a>
+        </div>
+    <?php endif; ?>
+
+    <!-- Connection Status Card -->
+    <div class="dashboard-card connection-status">
+        <div class="card-header">
+            <h2><?= $block->escapeHtml(__('Connection Status')) ?></h2>
+            <button type="button" class="action-default test-connection" data-url="<?= $block->escapeUrl($block->getTestConnectionUrl()) ?>">
+                <span><?= $block->escapeHtml(__('Test Connection')) ?></span>
+            </button>
+        </div>
+        <div class="card-content">
+            <div class="connection-info" id="connection-info">
+                <?php if ($isConfigured): ?>
+                    <div class="status-indicator loading">
+                        <span class="indicator"></span>
+                        <span class="status-text"><?= $block->escapeHtml(__('Checking connection...')) ?></span>
+                    </div>
+                <?php else: ?>
+                    <div class="status-indicator disconnected">
+                        <span class="indicator"></span>
+                        <span class="status-text"><?= $block->escapeHtml(__('Not Configured')) ?></span>
+                    </div>
+                <?php endif; ?>
+                <div class="connection-details">
+                    <div class="detail-row">
+                        <span class="label"><?= $block->escapeHtml(__('Webhook URL:')) ?></span>
+                        <span class="value"><?= $block->escapeHtml($block->getWebhookUrl() ?: 'Not set') ?></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label"><?= $block->escapeHtml(__('Tenant ID:')) ?></span>
+                        <span class="value"><?= $block->escapeHtml($block->getTenantId() ?: 'Not set') ?></span>
+                    </div>
+                    <div class="detail-row latency-row" style="display: none;">
+                        <span class="label"><?= $block->escapeHtml(__('Latency:')) ?></span>
+                        <span class="value latency-value">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Circuit Breaker Status -->
+            <div class="circuit-breaker-status">
+                <h3><?= $block->escapeHtml(__('Circuit Breaker')) ?></h3>
+                <div class="circuit-state <?= $block->escapeHtmlAttr($circuitStatus['state']) ?>">
+                    <span class="state-label"><?= $block->escapeHtml(ucfirst($circuitStatus['state'])) ?></span>
+                    <?php if ($circuitStatus['failure_count'] > 0): ?>
+                        <span class="failure-count"><?= (int)$circuitStatus['failure_count'] ?> failures</span>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Queue Status Card -->
+    <div class="dashboard-card queue-status">
+        <div class="card-header">
+            <h2><?= $block->escapeHtml(__('Queue Status')) ?></h2>
+            <div class="card-actions">
+                <button type="button" class="action-default process-queue" data-url="<?= $block->escapeUrl($block->getProcessQueueUrl()) ?>">
+                    <span><?= $block->escapeHtml(__('Process Now')) ?></span>
+                </button>
+                <a href="<?= $block->escapeUrl($block->getQueueGridUrl()) ?>" class="action-default">
+                    <span><?= $block->escapeHtml(__('View Queue')) ?></span>
+                </a>
+            </div>
+        </div>
+        <div class="card-content">
+            <div class="queue-stats">
+                <div class="stat-box pending">
+                    <span class="stat-value"><?= (int)$queueStats['pending'] ?></span>
+                    <span class="stat-label"><?= $block->escapeHtml(__('Pending')) ?></span>
+                </div>
+                <div class="stat-box processing">
+                    <span class="stat-value"><?= (int)$queueStats['processing'] ?></span>
+                    <span class="stat-label"><?= $block->escapeHtml(__('Processing')) ?></span>
+                </div>
+                <div class="stat-box sent">
+                    <span class="stat-value"><?= (int)$queueStats['sent'] ?></span>
+                    <span class="stat-label"><?= $block->escapeHtml(__('Sent')) ?></span>
+                </div>
+                <div class="stat-box failed">
+                    <span class="stat-value"><?= (int)$queueStats['failed'] ?></span>
+                    <span class="stat-label"><?= $block->escapeHtml(__('Failed')) ?></span>
+                </div>
+                <div class="stat-box dead">
+                    <span class="stat-value"><?= (int)$queueStats['dead'] ?></span>
+                    <span class="stat-label"><?= $block->escapeHtml(__('Dead')) ?></span>
+                </div>
+            </div>
+
+            <?php $oldestAge = $block->getOldestPendingAge(); ?>
+            <?php if ($oldestAge !== null && $oldestAge > 5): ?>
+                <div class="queue-alert <?= $oldestAge > 30 ? 'warning' : '' ?>">
+                    <span><?= $block->escapeHtml(__('Oldest pending item: %1 minutes ago', $oldestAge)) ?></span>
+                </div>
+            <?php endif; ?>
+
+            <div class="queue-actions">
+                <?php if ($queueStats['failed'] > 0): ?>
+                    <button type="button" class="action-secondary retry-failed" data-url="<?= $block->escapeUrl($block->getRetryFailedUrl()) ?>">
+                        <span><?= $block->escapeHtml(__('Retry Failed (%1)', $queueStats['failed'])) ?></span>
+                    </button>
+                <?php endif; ?>
+                <?php if ($queueStats['sent'] > 0): ?>
+                    <button type="button" class="action-secondary clear-sent" data-url="<?= $block->escapeUrl($block->getClearSentUrl()) ?>">
+                        <span><?= $block->escapeHtml(__('Clear Sent')) ?></span>
+                    </button>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+
+    <!-- Entity Sync Status Card -->
+    <div class="dashboard-card entity-status">
+        <div class="card-header">
+            <h2><?= $block->escapeHtml(__('Entity Sync Status')) ?></h2>
+        </div>
+        <div class="card-content">
+            <table class="data-table entity-table">
+                <thead>
+                    <tr>
+                        <th><?= $block->escapeHtml(__('Entity')) ?></th>
+                        <th><?= $block->escapeHtml(__('Status')) ?></th>
+                        <th><?= $block->escapeHtml(__('Count')) ?></th>
+                        <th><?= $block->escapeHtml(__('Actions')) ?></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($entityStatus as $type => $entity): ?>
+                        <tr>
+                            <td><?= $block->escapeHtml($entity['label']) ?></td>
+                            <td>
+                                <span class="sync-status <?= $entity['enabled'] ? 'enabled' : 'disabled' ?>">
+                                    <?= $entity['enabled'] ? $block->escapeHtml(__('Enabled')) : $block->escapeHtml(__('Disabled')) ?>
+                                </span>
+                            </td>
+                            <td><?= (int)$entity['count'] ?></td>
+                            <td>
+                                <?php if ($entity['enabled']): ?>
+                                    <button type="button"
+                                            class="action-default sync-entity"
+                                            data-url="<?= $block->escapeUrl($block->getSyncUrl($type)) ?>"
+                                            data-type="<?= $block->escapeHtmlAttr($type) ?>">
+                                        <span><?= $block->escapeHtml(__('Sync All')) ?></span>
+                                    </button>
+                                <?php else: ?>
+                                    <span class="disabled-text"><?= $block->escapeHtml(__('Sync disabled')) ?></span>
+                                <?php endif; ?>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script type="text/x-magento-init">
+{
+    "#ragsync-dashboard": {
+        "Lmarcho_RagSync/js/dashboard": {
+            "testConnectionUrl": "<?= $block->escapeUrl($block->getTestConnectionUrl()) ?>",
+            "isConfigured": <?= $isConfigured ? 'true' : 'false' ?>
+        }
+    }
+}
+</script>

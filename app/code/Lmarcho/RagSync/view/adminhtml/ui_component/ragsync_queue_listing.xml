@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * Lmarcho RagSync Module - Queue Grid UI Component
+ */
+-->
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">ragsync_queue_listing.ragsync_queue_listing_data_source</item>
+        </item>
+    </argument>
+    <settings>
+        <buttons>
+            <button name="back">
+                <url path="ragsync/dashboard/index"/>
+                <class>back</class>
+                <label translate="true">Back to Dashboard</label>
+            </button>
+        </buttons>
+        <spinner>ragsync_queue_columns</spinner>
+        <deps>
+            <dep>ragsync_queue_listing.ragsync_queue_listing_data_source</dep>
+        </deps>
+    </settings>
+    <dataSource name="ragsync_queue_listing_data_source" component="Magento_Ui/js/grid/provider">
+        <settings>
+            <storageConfig>
+                <param name="indexField" xsi:type="string">id</param>
+            </storageConfig>
+            <updateUrl path="mui/index/render"/>
+        </settings>
+        <aclResource>Lmarcho_RagSync::queue</aclResource>
+        <dataProvider class="Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider" name="ragsync_queue_listing_data_source">
+            <settings>
+                <requestFieldName>id</requestFieldName>
+                <primaryFieldName>id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+    <listingToolbar name="listing_top">
+        <settings>
+            <sticky>true</sticky>
+        </settings>
+        <bookmark name="bookmarks"/>
+        <columnsControls name="columns_controls"/>
+        <filters name="listing_filters">
+            <filterSelect name="status" provider="${ $.parentName }">
+                <settings>
+                    <options class="Lmarcho\RagSync\Ui\Component\Listing\Column\StatusOptions"/>
+                    <caption translate="true">Select...</caption>
+                    <label translate="true">Status</label>
+                    <dataScope>status</dataScope>
+                </settings>
+            </filterSelect>
+            <filterSelect name="entity_type" provider="${ $.parentName }">
+                <settings>
+                    <options class="Lmarcho\RagSync\Ui\Component\Listing\Column\EntityTypeOptions"/>
+                    <caption translate="true">Select...</caption>
+                    <label translate="true">Entity Type</label>
+                    <dataScope>entity_type</dataScope>
+                </settings>
+            </filterSelect>
+        </filters>
+        <massaction name="listing_massaction">
+            <action name="retry">
+                <settings>
+                    <url path="ragsync/queue/massRetry"/>
+                    <type>retry</type>
+                    <label translate="true">Retry</label>
+                    <confirm>
+                        <message translate="true">Are you sure you want to retry selected items?</message>
+                        <title translate="true">Retry Items</title>
+                    </confirm>
+                </settings>
+            </action>
+            <action name="delete">
+                <settings>
+                    <url path="ragsync/queue/massDelete"/>
+                    <type>delete</type>
+                    <label translate="true">Delete</label>
+                    <confirm>
+                        <message translate="true">Are you sure you want to delete selected items?</message>
+                        <title translate="true">Delete Items</title>
+                    </confirm>
+                </settings>
+            </action>
+        </massaction>
+        <paging name="listing_paging"/>
+    </listingToolbar>
+    <columns name="ragsync_queue_columns">
+        <selectionsColumn name="ids" sortOrder="10">
+            <settings>
+                <indexField>id</indexField>
+            </settings>
+        </selectionsColumn>
+        <column name="id" sortOrder="20">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">ID</label>
+                <sorting>desc</sorting>
+            </settings>
+        </column>
+        <column name="entity_type" sortOrder="30">
+            <settings>
+                <filter>select</filter>
+                <options class="Lmarcho\RagSync\Ui\Component\Listing\Column\EntityTypeOptions"/>
+                <label translate="true">Entity Type</label>
+            </settings>
+        </column>
+        <column name="entity_id" sortOrder="40">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Entity ID</label>
+            </settings>
+        </column>
+        <column name="store_id" sortOrder="50">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Store ID</label>
+            </settings>
+        </column>
+        <column name="action" sortOrder="60">
+            <settings>
+                <filter>select</filter>
+                <options class="Lmarcho\RagSync\Ui\Component\Listing\Column\ActionOptions"/>
+                <label translate="true">Action</label>
+            </settings>
+        </column>
+        <column name="status" sortOrder="70" class="Lmarcho\RagSync\Ui\Component\Listing\Column\Status">
+            <settings>
+                <filter>select</filter>
+                <options class="Lmarcho\RagSync\Ui\Component\Listing\Column\StatusOptions"/>
+                <label translate="true">Status</label>
+                <bodyTmpl>ui/grid/cells/html</bodyTmpl>
+            </settings>
+        </column>
+        <column name="priority" sortOrder="80">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">Priority</label>
+            </settings>
+        </column>
+        <column name="attempts" sortOrder="90">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">Attempts</label>
+            </settings>
+        </column>
+        <column name="error_message" sortOrder="100">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Error</label>
+            </settings>
+        </column>
+        <column name="created_at" class="Magento\Ui\Component\Listing\Columns\Date" component="Magento_Ui/js/grid/columns/date" sortOrder="110">
+            <settings>
+                <filter>dateRange</filter>
+                <dataType>date</dataType>
+                <label translate="true">Created At</label>
+            </settings>
+        </column>
+        <column name="updated_at" class="Magento\Ui\Component\Listing\Columns\Date" component="Magento_Ui/js/grid/columns/date" sortOrder="120">
+            <settings>
+                <filter>dateRange</filter>
+                <dataType>date</dataType>
+                <label translate="true">Updated At</label>
+            </settings>
+        </column>
+    </columns>
+</listing>

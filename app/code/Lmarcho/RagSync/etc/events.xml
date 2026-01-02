@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Lmarcho RagSync Module - Event Observers
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+
+    <!-- Product Events -->
+    <event name="catalog_product_save_after">
+        <observer name="ragsync_product_save" instance="Lmarcho\RagSync\Observer\ProductSaveObserver"/>
+    </event>
+    <event name="catalog_product_delete_before">
+        <observer name="ragsync_product_delete" instance="Lmarcho\RagSync\Observer\ProductDeleteObserver"/>
+    </event>
+
+    <!-- CMS Page Events -->
+    <event name="cms_page_save_after">
+        <observer name="ragsync_cms_page_save" instance="Lmarcho\RagSync\Observer\CmsPageSaveObserver"/>
+    </event>
+    <event name="cms_page_delete_before">
+        <observer name="ragsync_cms_page_delete" instance="Lmarcho\RagSync\Observer\CmsPageDeleteObserver"/>
+    </event>
+
+    <!-- CMS Block Events -->
+    <event name="cms_block_save_after">
+        <observer name="ragsync_cms_block_save" instance="Lmarcho\RagSync\Observer\CmsBlockSaveObserver"/>
+    </event>
+    <event name="cms_block_delete_before">
+        <observer name="ragsync_cms_block_delete" instance="Lmarcho\RagSync\Observer\CmsBlockDeleteObserver"/>
+    </event>
+
+    <!-- Category Events -->
+    <event name="catalog_category_save_after">
+        <observer name="ragsync_category_save" instance="Lmarcho\RagSync\Observer\CategorySaveObserver"/>
+    </event>
+    <event name="catalog_category_delete_before">
+        <observer name="ragsync_category_delete" instance="Lmarcho\RagSync\Observer\CategoryDeleteObserver"/>
+    </event>
+
+    <!-- Cart Price Rule Events -->
+    <event name="salesrule_rule_save_after">
+        <observer name="ragsync_cart_rule_save" instance="Lmarcho\RagSync\Observer\CartRuleSaveObserver"/>
+    </event>
+    <event name="salesrule_rule_delete_before">
+        <observer name="ragsync_cart_rule_delete" instance="Lmarcho\RagSync\Observer\CartRuleDeleteObserver"/>
+    </event>
+
+    <!-- Catalog Price Rule Events -->
+    <event name="catalogrule_rule_save_after">
+        <observer name="ragsync_catalog_rule_save" instance="Lmarcho\RagSync\Observer\CatalogRuleSaveObserver"/>
+    </event>
+</config>

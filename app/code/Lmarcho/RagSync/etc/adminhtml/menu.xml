@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Lmarcho RagSync Module - Admin Menu
+ *
+ * Marketing → RAG Sync → Dashboard/Queue
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="Lmarcho_RagSync::ragsync"
+             title="RAG Sync"
+             module="Lmarcho_RagSync"
+             sortOrder="100"
+             parent="Magento_Backend::marketing"
+             resource="Lmarcho_RagSync::ragsync"/>
+
+        <add id="Lmarcho_RagSync::dashboard"
+             title="Dashboard"
+             module="Lmarcho_RagSync"
+             sortOrder="10"
+             parent="Lmarcho_RagSync::ragsync"
+             action="ragsync/dashboard/index"
+             resource="Lmarcho_RagSync::dashboard"/>
+
+        <add id="Lmarcho_RagSync::queue"
+             title="Queue"
+             module="Lmarcho_RagSync"
+             sortOrder="20"
+             parent="Lmarcho_RagSync::ragsync"
+             action="ragsync/queue/index"
+             resource="Lmarcho_RagSync::queue"/>
+    </menu>
+</config>

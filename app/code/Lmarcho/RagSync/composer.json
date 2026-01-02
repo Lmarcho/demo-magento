@@ -1,0 +1,31 @@
+{
+    "name": "lmarcho/module-ragsync",
+    "description": "Magento 2 module to synchronize content with RAG backend for AI-powered search",
+    "type": "magento2-module",
+    "version": "1.0.0",
+    "license": "proprietary",
+    "authors": [
+        {
+            "name": "Lmarcho",
+            "email": "dev@lmarcho.com"
+        }
+    ],
+    "require": {
+        "php": ">=8.1",
+        "magento/framework": ">=103.0",
+        "magento/module-catalog": ">=104.0",
+        "magento/module-cms": ">=104.0",
+        "magento/module-sales-rule": ">=101.0",
+        "magento/module-catalog-rule": ">=101.0",
+        "magento/module-cron": ">=100.4",
+        "guzzlehttp/guzzle": "^7.0"
+    },
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "Lmarcho\\RagSync\\": ""
+        }
+    }
+}

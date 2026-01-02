@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Lmarcho RagSync Module - Cron Jobs
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Cron:etc/crontab.xsd">
+    <group id="default">
+        <!-- Process pending queue items - runs every minute -->
+        <job name="ragsync_process_queue" instance="Lmarcho\RagSync\Cron\ProcessQueue" method="execute">
+            <schedule>* * * * *</schedule>
+        </job>
+
+        <!-- Full product sync - configurable schedule, default 2:00 AM daily -->
+        <job name="ragsync_full_product_sync" instance="Lmarcho\RagSync\Cron\FullProductSync" method="execute">
+            <config_path>rag_sync/schedule/products_cron</config_path>
+        </job>
+
+        <!-- Full CMS sync - configurable schedule, default 2:30 AM daily -->
+        <job name="ragsync_full_cms_sync" instance="Lmarcho\RagSync\Cron\FullCmsSync" method="execute">
+            <config_path>rag_sync/schedule/cms_cron</config_path>
+        </job>
+
+        <!-- Full category sync - configurable schedule, default 3:00 AM daily -->
+        <job name="ragsync_full_category_sync" instance="Lmarcho\RagSync\Cron\FullCategorySync" method="execute">
+            <config_path>rag_sync/schedule/categories_cron</config_path>
+        </job>
+
+        <!-- Promotions sync - configurable schedule, default every hour -->
+        <job name="ragsync_promotions_sync" instance="Lmarcho\RagSync\Cron\PromotionSync" method="execute">
+            <config_path>rag_sync/schedule/promotions_cron</config_path>
+        </job>
+
+        <!-- Queue cleanup - daily at 5:00 AM -->
+        <job name="ragsync_queue_cleanup" instance="Lmarcho\RagSync\Cron\CleanupQueue" method="execute">
+            <schedule>0 5 * * *</schedule>
+        </job>
+
+        <!-- Reset stuck items - every 15 minutes -->
+        <job name="ragsync_reset_stuck" instance="Lmarcho\RagSync\Cron\ResetStuckItems" method="execute">
+            <schedule>*/15 * * * *</schedule>
+        </job>
+    </group>
+</config>

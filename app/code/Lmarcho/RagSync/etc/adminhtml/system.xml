@@ -1,0 +1,342 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Lmarcho RagSync Module - Admin Configuration
+ *
+ * Stores → Configuration → Services → RAG Sync Integration
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <tab id="lmarcho" translate="label" sortOrder="900">
+            <label>Lmarcho</label>
+        </tab>
+
+        <section id="rag_sync" translate="label" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>RAG Sync Integration</label>
+            <tab>lmarcho</tab>
+            <resource>Lmarcho_RagSync::config</resource>
+
+            <!-- General Settings -->
+            <group id="general" translate="label" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>General Settings</label>
+
+                <field id="enabled" translate="label comment" type="select" sortOrder="10"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Module</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Enable or disable the RAG sync integration.</comment>
+                </field>
+
+                <field id="environment" translate="label comment" type="select" sortOrder="20"
+                       showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Environment</label>
+                    <source_model>Lmarcho\RagSync\Model\Config\Source\Environment</source_model>
+                    <comment>Select the current environment.</comment>
+                </field>
+
+                <field id="debug" translate="label comment" type="select" sortOrder="30"
+                       showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Debug Mode</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Enable detailed logging for debugging. Disable in production.</comment>
+                </field>
+
+                <field id="log_retention_days" translate="label comment" type="text" sortOrder="40"
+                       showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Log Retention Days</label>
+                    <validate>validate-digits validate-greater-than-zero</validate>
+                    <comment>Number of days to retain log entries.</comment>
+                </field>
+            </group>
+
+            <!-- Connection Settings -->
+            <group id="connection" translate="label" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Connection</label>
+
+                <field id="webhook_url" translate="label comment" type="text" sortOrder="10"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Webhook Base URL</label>
+                    <validate>validate-url</validate>
+                    <comment>The base URL of your RAG backend (e.g., https://rag-backend.example.com)</comment>
+                </field>
+
+                <field id="tenant_id" translate="label comment" type="text" sortOrder="20"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Tenant ID</label>
+                    <validate>required-entry</validate>
+                    <comment>Your unique tenant identifier.</comment>
+                </field>
+
+                <field id="api_secret" translate="label comment" type="obscure" sortOrder="30"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>API Secret Key</label>
+                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                    <comment>Shared secret for HMAC signature verification.</comment>
+                </field>
+
+                <field id="timeout" translate="label comment" type="text" sortOrder="40"
+                       showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Connection Timeout (seconds)</label>
+                    <validate>validate-digits validate-greater-than-zero</validate>
+                    <comment>HTTP request timeout in seconds.</comment>
+                </field>
+
+                <field id="test_connection" translate="label" type="button" sortOrder="50"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Test Connection</label>
+                    <frontend_model>Lmarcho\RagSync\Block\Adminhtml\System\Config\TestConnection</frontend_model>
+                </field>
+            </group>
+
+            <!-- Products Settings -->
+            <group id="products" translate="label" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Products</label>
+
+                <field id="enabled" translate="label" type="select" sortOrder="10"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Product Sync</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+
+                <field id="include_disabled" translate="label comment" type="select" sortOrder="20"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Include Disabled Products</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Sync products that are disabled.</comment>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+
+                <field id="include_not_visible" translate="label comment" type="select" sortOrder="30"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Include Not Visible Individually</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Sync products not visible individually (e.g., simple products of configurables).</comment>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+
+                <field id="sync_attributes" translate="label comment" type="text" sortOrder="40"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Sync Product Attributes</label>
+                    <comment>Comma-separated list of attribute codes to sync (e.g., brand,color,size,material).</comment>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+
+                <field id="exclude_categories" translate="label comment" type="text" sortOrder="50"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Exclude Category IDs</label>
+                    <comment>Comma-separated category IDs to exclude (e.g., 2,999 for root and test).</comment>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+            </group>
+
+            <!-- CMS Pages Settings -->
+            <group id="cms_pages" translate="label" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>CMS Pages</label>
+
+                <field id="enabled" translate="label" type="select" sortOrder="10"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable CMS Page Sync</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+
+                <field id="sync_mode" translate="label comment" type="select" sortOrder="20"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Sync Mode</label>
+                    <source_model>Lmarcho\RagSync\Model\Config\Source\SyncMode</source_model>
+                    <comment>Whitelist: Only sync specified pages. Blacklist: Sync all except specified.</comment>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+
+                <field id="identifiers" translate="label comment" type="textarea" sortOrder="30"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Page Identifiers</label>
+                    <comment>Comma-separated page identifiers to include/exclude based on sync mode.</comment>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+
+                <field id="exclude_identifiers" translate="label comment" type="textarea" sortOrder="40"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Exclude Page Identifiers</label>
+                    <comment>Comma-separated page identifiers to always exclude (e.g., no-route,home,enable-cookies).</comment>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+            </group>
+
+            <!-- CMS Blocks Settings -->
+            <group id="cms_blocks" translate="label" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>CMS Blocks</label>
+
+                <field id="enabled" translate="label" type="select" sortOrder="10"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable CMS Block Sync</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+
+                <field id="identifiers" translate="label comment" type="textarea" sortOrder="20"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Block Identifiers</label>
+                    <comment>Comma-separated block identifiers to sync (e.g., footer-info,store-hours).</comment>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+            </group>
+
+            <!-- Categories Settings -->
+            <group id="categories" translate="label" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Categories</label>
+
+                <field id="enabled" translate="label" type="select" sortOrder="10"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Category Sync</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+
+                <field id="min_level" translate="label comment" type="text" sortOrder="20"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Minimum Category Level</label>
+                    <validate>validate-digits</validate>
+                    <comment>Skip categories below this level (2 = skip root category).</comment>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+
+                <field id="include_inactive" translate="label" type="select" sortOrder="30"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Include Inactive Categories</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+
+                <field id="include_product_count" translate="label" type="select" sortOrder="40"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Include Product Count</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+            </group>
+
+            <!-- Promotions Settings -->
+            <group id="promotions" translate="label" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Promotions</label>
+
+                <field id="enabled" translate="label" type="select" sortOrder="10"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Promotion Sync</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+
+                <field id="rule_types" translate="label comment" type="select" sortOrder="20"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Rule Types</label>
+                    <source_model>Lmarcho\RagSync\Model\Config\Source\RuleTypes</source_model>
+                    <comment>Which types of price rules to sync.</comment>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+
+                <field id="include_inactive" translate="label" type="select" sortOrder="30"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Include Inactive Rules</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+
+                <field id="include_expired" translate="label" type="select" sortOrder="40"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Include Expired Rules</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+            </group>
+
+            <!-- Queue Settings -->
+            <group id="queue" translate="label" sortOrder="80" showInDefault="1" showInWebsite="0" showInStore="0">
+                <label>Queue Settings</label>
+
+                <field id="batch_size" translate="label comment" type="text" sortOrder="10"
+                       showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Batch Size</label>
+                    <validate>validate-digits validate-greater-than-zero</validate>
+                    <comment>Number of items to process per cron run.</comment>
+                </field>
+
+                <field id="max_retries" translate="label comment" type="text" sortOrder="20"
+                       showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Max Retry Attempts</label>
+                    <validate>validate-digits</validate>
+                    <comment>Maximum number of retry attempts before marking as dead.</comment>
+                </field>
+
+                <field id="retry_delays" translate="label comment" type="text" sortOrder="30"
+                       showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Retry Delays (minutes)</label>
+                    <comment>Comma-separated delays between retries (e.g., 5,15,60).</comment>
+                </field>
+
+                <field id="cleanup_days" translate="label comment" type="text" sortOrder="40"
+                       showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Queue Cleanup After (days)</label>
+                    <validate>validate-digits validate-greater-than-zero</validate>
+                    <comment>Remove sent items older than this many days.</comment>
+                </field>
+            </group>
+
+            <!-- Full Sync Schedule -->
+            <group id="schedule" translate="label" sortOrder="90" showInDefault="1" showInWebsite="0" showInStore="0">
+                <label>Full Sync Schedule</label>
+                <comment><![CDATA[Configure when full entity syncs run. Uses cron expression format.]]></comment>
+
+                <field id="products_cron" translate="label comment" type="text" sortOrder="10"
+                       showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Products Full Sync</label>
+                    <comment>Cron expression (default: 0 2 * * * = 2:00 AM daily)</comment>
+                </field>
+
+                <field id="cms_cron" translate="label comment" type="text" sortOrder="20"
+                       showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>CMS Content Full Sync</label>
+                    <comment>Cron expression (default: 30 2 * * * = 2:30 AM daily)</comment>
+                </field>
+
+                <field id="categories_cron" translate="label comment" type="text" sortOrder="30"
+                       showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Categories Full Sync</label>
+                    <comment>Cron expression (default: 0 3 * * * = 3:00 AM daily)</comment>
+                </field>
+
+                <field id="promotions_cron" translate="label comment" type="text" sortOrder="40"
+                       showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Promotions Full Sync</label>
+                    <comment>Cron expression (default: 0 * * * * = every hour)</comment>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

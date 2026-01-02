@@ -1,0 +1,303 @@
+<?php
+/**
+ * Lmarcho RagSync Module
+ */
+
+declare(strict_types=1);
+
+namespace Lmarcho\RagSync\Model\DataBuilder;
+
+use Magento\Catalog\Api\Data\ProductInterface;
+use Magento\Catalog\Api\ProductRepositoryInterface;
+use Magento\Catalog\Model\Product;
+use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory as CategoryCollectionFactory;
+use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Store\Model\StoreManagerInterface;
+use Lmarcho\RagSync\Model\Config;
+
+class ProductBuilder
+{
+    /**
+     * @var ProductRepositoryInterface
+     */
+    private ProductRepositoryInterface $productRepository;
+
+    /**
+     * @var CategoryCollectionFactory
+     */
+    private CategoryCollectionFactory $categoryCollectionFactory;
+
+    /**
+     * @var StoreManagerInterface
+     */
+    private StoreManagerInterface $storeManager;
+
+    /**
+     * @var Config
+     */
+    private Config $config;
+
+    /**
+     * @param ProductRepositoryInterface $productRepository
+     * @param CategoryCollectionFactory $categoryCollectionFactory
+     * @param StoreManagerInterface $storeManager
+     * @param Config $config
+     */
+    public function __construct(
+        ProductRepositoryInterface $productRepository,
+        CategoryCollectionFactory $categoryCollectionFactory,
+        StoreManagerInterface $storeManager,
+        Config $config
+    ) {
+        $this->productRepository = $productRepository;
+        $this->categoryCollectionFactory = $categoryCollectionFactory;
+        $this->storeManager = $storeManager;
+        $this->config = $config;
+    }
+
+    /**
+     * Build product data for sync
+     *
+     * @param int $productId
+     * @param int $storeId
+     * @return array|null
+     */
+    public function build(int $productId, int $storeId = 0): ?array
+    {
+        try {
+            $product = $this->productRepository->getById($productId, false, $storeId);
+        } catch (NoSuchEntityException $e) {
+            return null;
+        }
+
+        return $this->buildFromProduct($product, $storeId);
+    }
+
+    /**
+     * Build product data from product object
+     *
+     * @param ProductInterface|Product $product
+     * @param int $storeId
+     * @return array
+     */
+    public function buildFromProduct(ProductInterface $product, int $storeId = 0): array
+    {
+        $data = [
+            'id' => (int)$product->getId(),
+            'sku' => $product->getSku(),
+            'name' => $product->getName(),
+            'type' => $product->getTypeId(),
+            'url_key' => $product->getUrlKey(),
+            'description' => $this->cleanHtml($product->getDescription()),
+            'short_description' => $this->cleanHtml($product->getShortDescription()),
+            'meta_title' => $product->getMetaTitle(),
+            'meta_description' => $product->getMetaDescription(),
+            'meta_keywords' => $product->getMetaKeyword(),
+            'status' => (int)$product->getStatus(),
+            'visibility' => (int)$product->getVisibility(),
+            'categories' => $this->getCategoryNames($product),
+            'category_ids' => array_map('intval', $product->getCategoryIds() ?: []),
+            'attributes' => $this->getCustomAttributes($product, $storeId),
+            'image_alt_texts' => $this->getImageAltTexts($product),
+            'store_id' => $storeId,
+        ];
+
+        // Add URL if available
+        if ($product instanceof Product) {
+            try {
+                $data['url'] = $product->getProductUrl();
+            } catch (\Exception $e) {
+                $data['url'] = null;
+            }
+        }
+
+        return $data;
+    }
+
+    /**
+     * Get category names for product
+     *
+     * @param ProductInterface $product
+     * @return array
+     */
+    private function getCategoryNames(ProductInterface $product): array
+    {
+        $categoryIds = $product->getCategoryIds();
+
+        if (empty($categoryIds)) {
+            return [];
+        }
+
+        $excludedIds = $this->config->getExcludedCategoryIds();
+        $categoryIds = array_diff($categoryIds, $excludedIds);
+
+        if (empty($categoryIds)) {
+            return [];
+        }
+
+        $collection = $this->categoryCollectionFactory->create();
+        $collection->addAttributeToSelect('name')
+            ->addFieldToFilter('entity_id', ['in' => $categoryIds])
+            ->addFieldToFilter('level', ['gteq' => 2]); // Skip root categories
+
+        $names = [];
+        foreach ($collection as $category) {
+            $names[] = $category->getName();
+        }
+
+        return $names;
+    }
+
+    /**
+     * Get custom attributes for product
+     *
+     * @param ProductInterface $product
+     * @param int $storeId
+     * @return array
+     */
+    private function getCustomAttributes(ProductInterface $product, int $storeId): array
+    {
+        $attributeCodes = $this->config->getProductSyncAttributes($storeId);
+        $attributes = [];
+
+        foreach ($attributeCodes as $code) {
+            $value = $this->getAttributeValue($product, $code);
+            if ($value !== null && $value !== '') {
+                $attributes[$code] = $value;
+            }
+        }
+
+        return $attributes;
+    }
+
+    /**
+     * Get attribute value with label for select/multiselect
+     *
+     * @param ProductInterface|Product $product
+     * @param string $attributeCode
+     * @return mixed
+     */
+    private function getAttributeValue(ProductInterface $product, string $attributeCode)
+    {
+        if (!$product instanceof Product) {
+            return $product->getData($attributeCode);
+        }
+
+        $attribute = $product->getResource()->getAttribute($attributeCode);
+
+        if (!$attribute) {
+            return null;
+        }
+
+        $value = $product->getData($attributeCode);
+
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        // Get label for select/multiselect attributes
+        $frontendInput = $attribute->getFrontendInput();
+        if (in_array($frontendInput, ['select', 'multiselect'])) {
+            $optionText = $product->getAttributeText($attributeCode);
+            if ($optionText) {
+                return is_array($optionText) ? implode(', ', $optionText) : $optionText;
+            }
+        }
+
+        return $value;
+    }
+
+    /**
+     * Get image alt texts
+     *
+     * @param ProductInterface|Product $product
+     * @return array
+     */
+    private function getImageAltTexts(ProductInterface $product): array
+    {
+        if (!$product instanceof Product) {
+            return [];
+        }
+
+        $altTexts = [];
+        $mediaGallery = $product->getMediaGalleryImages();
+
+        if ($mediaGallery) {
+            foreach ($mediaGallery as $image) {
+                $label = $image->getLabel();
+                if (!empty($label)) {
+                    $altTexts[] = $label;
+                }
+            }
+        }
+
+        return array_unique($altTexts);
+    }
+
+    /**
+     * Clean HTML from content
+     *
+     * @param string|null $html
+     * @return string|null
+     */
+    private function cleanHtml(?string $html): ?string
+    {
+        if ($html === null || $html === '') {
+            return null;
+        }
+
+        // Remove HTML tags but keep text
+        $text = strip_tags($html);
+
+        // Decode HTML entities
+        $text = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+
+        // Normalize whitespace
+        $text = preg_replace('/\s+/', ' ', $text);
+        $text = trim($text);
+
+        return $text ?: null;
+    }
+
+    /**
+     * Check if product should be synced based on config
+     *
+     * @param ProductInterface|Product $product
+     * @param int|null $storeId
+     * @return bool
+     */
+    public function shouldSync(ProductInterface $product, ?int $storeId = null): bool
+    {
+        if (!$this->config->isProductSyncEnabled($storeId)) {
+            return false;
+        }
+
+        // Check if disabled products should be included
+        if (!$this->config->includeDisabledProducts($storeId)) {
+            if ($product->getStatus() != \Magento\Catalog\Model\Product\Attribute\Source\Status::STATUS_ENABLED) {
+                return false;
+            }
+        }
+
+        // Check if not visible products should be included
+        if (!$this->config->includeNotVisibleProducts($storeId)) {
+            $visibility = (int)$product->getVisibility();
+            if ($visibility == \Magento\Catalog\Model\Product\Visibility::VISIBILITY_NOT_VISIBLE) {
+                return false;
+            }
+        }
+
+        // Check if product is in excluded categories
+        $excludedCategoryIds = $this->config->getExcludedCategoryIds($storeId);
+        if (!empty($excludedCategoryIds)) {
+            $productCategoryIds = $product->getCategoryIds() ?: [];
+            // If ALL product categories are excluded, don't sync
+            $nonExcludedCategories = array_diff($productCategoryIds, $excludedCategoryIds);
+            if (empty($nonExcludedCategories) && !empty($productCategoryIds)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+}

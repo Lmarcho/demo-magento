@@ -1,0 +1,166 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Lmarcho RagSync Module - Dependency Injection Configuration
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+
+    <!-- Logger configuration -->
+    <type name="Lmarcho\RagSync\Model\WebhookSender">
+        <arguments>
+            <argument name="logger" xsi:type="object">Lmarcho\RagSync\Logger\Handler</argument>
+        </arguments>
+    </type>
+
+    <type name="Lmarcho\RagSync\Model\CircuitBreaker">
+        <arguments>
+            <argument name="logger" xsi:type="object">Lmarcho\RagSync\Logger\Handler</argument>
+            <argument name="failureThreshold" xsi:type="number">5</argument>
+            <argument name="recoveryTimeout" xsi:type="number">300</argument>
+        </arguments>
+    </type>
+
+    <type name="Lmarcho\RagSync\Model\QueueService">
+        <arguments>
+            <argument name="logger" xsi:type="object">Lmarcho\RagSync\Logger\Handler</argument>
+        </arguments>
+    </type>
+
+    <type name="Lmarcho\RagSync\Cron\ProcessQueue">
+        <arguments>
+            <argument name="logger" xsi:type="object">Lmarcho\RagSync\Logger\Handler</argument>
+        </arguments>
+    </type>
+
+    <type name="Lmarcho\RagSync\Cron\FullProductSync">
+        <arguments>
+            <argument name="logger" xsi:type="object">Lmarcho\RagSync\Logger\Handler</argument>
+        </arguments>
+    </type>
+
+    <type name="Lmarcho\RagSync\Cron\FullCmsSync">
+        <arguments>
+            <argument name="logger" xsi:type="object">Lmarcho\RagSync\Logger\Handler</argument>
+        </arguments>
+    </type>
+
+    <type name="Lmarcho\RagSync\Cron\FullCategorySync">
+        <arguments>
+            <argument name="logger" xsi:type="object">Lmarcho\RagSync\Logger\Handler</argument>
+        </arguments>
+    </type>
+
+    <type name="Lmarcho\RagSync\Cron\PromotionSync">
+        <arguments>
+            <argument name="logger" xsi:type="object">Lmarcho\RagSync\Logger\Handler</argument>
+        </arguments>
+    </type>
+
+    <type name="Lmarcho\RagSync\Cron\CleanupQueue">
+        <arguments>
+            <argument name="logger" xsi:type="object">Lmarcho\RagSync\Logger\Handler</argument>
+        </arguments>
+    </type>
+
+    <type name="Lmarcho\RagSync\Cron\ResetStuckItems">
+        <arguments>
+            <argument name="logger" xsi:type="object">Lmarcho\RagSync\Logger\Handler</argument>
+        </arguments>
+    </type>
+
+    <!-- Custom Logger Handler -->
+    <virtualType name="Lmarcho\RagSync\Logger\Handler" type="Magento\Framework\Logger\Monolog">
+        <arguments>
+            <argument name="name" xsi:type="string">ragsync</argument>
+            <argument name="handlers" xsi:type="array">
+                <item name="system" xsi:type="object">Lmarcho\RagSync\Logger\Handler\System</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="Lmarcho\RagSync\Logger\Handler\System" type="Magento\Framework\Logger\Handler\Base">
+        <arguments>
+            <argument name="fileName" xsi:type="string">/var/log/ragsync.log</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Guzzle Client Factory -->
+    <preference for="GuzzleHttp\ClientFactory" type="Lmarcho\RagSync\Http\ClientFactory"/>
+
+    <!-- UI Component Data Provider -->
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="ragsync_queue_listing_data_source" xsi:type="string">Lmarcho\RagSync\Model\ResourceModel\Queue\Grid\Collection</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <virtualType name="Lmarcho\RagSync\Model\ResourceModel\Queue\Grid\Collection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">rag_sync_queue</argument>
+            <argument name="resourceModel" xsi:type="string">Lmarcho\RagSync\Model\ResourceModel\Queue</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- CLI Commands -->
+    <type name="Magento\Framework\Console\CommandList">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="ragsync_sync_products" xsi:type="object">Lmarcho\RagSync\Console\Command\SyncProductsCommand</item>
+                <item name="ragsync_sync_cms" xsi:type="object">Lmarcho\RagSync\Console\Command\SyncCmsCommand</item>
+                <item name="ragsync_sync_categories" xsi:type="object">Lmarcho\RagSync\Console\Command\SyncCategoriesCommand</item>
+                <item name="ragsync_sync_promotions" xsi:type="object">Lmarcho\RagSync\Console\Command\SyncPromotionsCommand</item>
+                <item name="ragsync_queue_process" xsi:type="object">Lmarcho\RagSync\Console\Command\QueueProcessCommand</item>
+                <item name="ragsync_queue_status" xsi:type="object">Lmarcho\RagSync\Console\Command\QueueStatusCommand</item>
+                <item name="ragsync_queue_clear" xsi:type="object">Lmarcho\RagSync\Console\Command\QueueClearCommand</item>
+                <item name="ragsync_test_connection" xsi:type="object">Lmarcho\RagSync\Console\Command\TestConnectionCommand</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <!-- CLI Command Logger Injection -->
+    <type name="Lmarcho\RagSync\Console\Command\SyncProductsCommand">
+        <arguments>
+            <argument name="logger" xsi:type="object">Lmarcho\RagSync\Logger\Handler</argument>
+        </arguments>
+    </type>
+
+    <type name="Lmarcho\RagSync\Console\Command\SyncCmsCommand">
+        <arguments>
+            <argument name="logger" xsi:type="object">Lmarcho\RagSync\Logger\Handler</argument>
+        </arguments>
+    </type>
+
+    <type name="Lmarcho\RagSync\Console\Command\SyncCategoriesCommand">
+        <arguments>
+            <argument name="logger" xsi:type="object">Lmarcho\RagSync\Logger\Handler</argument>
+        </arguments>
+    </type>
+
+    <type name="Lmarcho\RagSync\Console\Command\SyncPromotionsCommand">
+        <arguments>
+            <argument name="logger" xsi:type="object">Lmarcho\RagSync\Logger\Handler</argument>
+        </arguments>
+    </type>
+
+    <type name="Lmarcho\RagSync\Console\Command\QueueProcessCommand">
+        <arguments>
+            <argument name="logger" xsi:type="object">Lmarcho\RagSync\Logger\Handler</argument>
+        </arguments>
+    </type>
+
+    <type name="Lmarcho\RagSync\Console\Command\QueueClearCommand">
+        <arguments>
+            <argument name="logger" xsi:type="object">Lmarcho\RagSync\Logger\Handler</argument>
+        </arguments>
+    </type>
+
+    <type name="Lmarcho\RagSync\Console\Command\TestConnectionCommand">
+        <arguments>
+            <argument name="logger" xsi:type="object">Lmarcho\RagSync\Logger\Handler</argument>
+        </arguments>
+    </type>
+</config>
