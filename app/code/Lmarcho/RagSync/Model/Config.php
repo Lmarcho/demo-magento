@@ -190,15 +190,17 @@ class Config
     }
 
     /**
-     * Get API secret (decrypted)
+     * Get API secret
+     *
+     * Note: Value is automatically decrypted by Magento when using
+     * backend_model="Magento\Config\Model\Config\Backend\Encrypted" in system.xml
      *
      * @param int|null $storeId
      * @return string
      */
     public function getApiSecret(?int $storeId = null): string
     {
-        $encrypted = (string)$this->getValue(self::XML_PATH_API_SECRET, $storeId);
-        return $encrypted ? $this->encryptor->decrypt($encrypted) : '';
+        return (string)$this->getValue(self::XML_PATH_API_SECRET, $storeId);
     }
 
     /**

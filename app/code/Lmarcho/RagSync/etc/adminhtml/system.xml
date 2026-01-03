@@ -59,7 +59,7 @@
                        showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Webhook Endpoint URL</label>
                     <validate>validate-url</validate>
-                    <comment><![CDATA[The full webhook endpoint URL from your RAG backend (e.g., http://localhost:8000/api/webhooks/magento/your-tenant-uuid)]]></comment>
+                    <comment>The full webhook endpoint URL from your RAG backend.</comment>
                 </field>
 
                 <field id="api_secret" translate="label comment" type="obscure" sortOrder="30"

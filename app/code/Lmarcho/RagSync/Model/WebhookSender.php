@@ -112,18 +112,30 @@ class WebhookSender
     }
 
     /**
-     * Test connection to webhook endpoint
-     *
-     * Sends a signed POST request to verify both endpoint and API secret key
+     * Test connection to webhook endpoint using saved config
      *
      * @param int|null $storeId
      * @return WebhookResponse
      */
     public function testConnection(?int $storeId = null): WebhookResponse
     {
+        $url = $this->config->getWebhookEndpoint('', $storeId);
+        $secret = $this->config->getApiSecret($storeId);
+
+        return $this->testConnectionWithCredentials($url, $secret);
+    }
+
+    /**
+     * Test connection with provided credentials (for testing before save)
+     *
+     * @param string $webhookUrl
+     * @param string $apiSecret
+     * @return WebhookResponse
+     */
+    public function testConnectionWithCredentials(string $webhookUrl, string $apiSecret): WebhookResponse
+    {
         try {
-            $client = $this->createClient($storeId);
-            $url = $this->config->getWebhookEndpoint('', $storeId);
+            $client = $this->createClient();
 
             // Create test payload
             $payload = [
@@ -133,13 +145,18 @@ class WebhookSender
             ];
 
             $jsonPayload = $this->serializer->serialize($payload);
-            $signature = $this->generateSignature($jsonPayload, $storeId);
+            $signature = hash_hmac('sha256', $jsonPayload, $apiSecret);
 
-            $headers = $this->getHeaders($signature, $storeId);
-            $headers['Content-Type'] = 'application/json';
+            $headers = [
+                'User-Agent' => self::USER_AGENT,
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/json',
+                'X-Magento-Webhook-Signature' => 'sha256=' . $signature,
+                'X-Environment' => $this->config->getEnvironment(),
+            ];
 
             $startTime = microtime(true);
-            $response = $client->post($url, [
+            $response = $client->post($webhookUrl, [
                 'headers' => $headers,
                 'body' => $jsonPayload,
             ]);

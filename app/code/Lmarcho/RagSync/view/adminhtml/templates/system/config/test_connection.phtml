@@ -14,16 +14,41 @@
             var $button = $(this);
             var $result = $('#ragsync_test_result');
 
+            // Get current form values
+            var webhookUrl = $('#rag_sync_connection_webhook_url').val();
+            var apiSecretField = $('#rag_sync_connection_api_secret');
+            var apiSecret = apiSecretField.val();
+
+            // Check if secret field has actual new value or is unchanged (obscured placeholder)
+            // Obscured fields typically have value like "******" or are empty when unchanged
+            var isSecretUnchanged = !apiSecret || apiSecret === '' || /^\*+$/.test(apiSecret);
+
+            // Validate URL is entered
+            if (!webhookUrl) {
+                $result.html('<span style="color: red;">Please enter Webhook Endpoint URL</span>');
+                return;
+            }
+
             $button.prop('disabled', true);
             $result.html('<span style="color: #666;">Testing connection...</span>');
+
+            // Build request data
+            var requestData = {
+                form_key: FORM_KEY,
+                webhook_url: webhookUrl
+            };
+
+            // Only send api_secret if user entered a new value
+            // If unchanged, controller will use saved config value
+            if (!isSecretUnchanged) {
+                requestData.api_secret = apiSecret;
+            }
 
             $.ajax({
                 url: '<?= $block->escapeUrl($block->getAjaxUrl()) ?>',
                 type: 'POST',
                 dataType: 'json',
-                data: {
-                    form_key: FORM_KEY
-                },
+                data: requestData,
                 success: function(response) {
                     $button.prop('disabled', false);
                     if (response.success) {

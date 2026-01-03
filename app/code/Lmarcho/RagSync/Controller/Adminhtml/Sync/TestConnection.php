@@ -60,18 +60,52 @@ class TestConnection extends Action
     {
         $result = $this->resultJsonFactory->create();
 
-        if (!$this->config->isConnectionConfigured()) {
+        // Get values from request (form fields)
+        $webhookUrl = $this->getRequest()->getParam('webhook_url');
+        $apiSecret = $this->getRequest()->getParam('api_secret');
+
+        // Use form URL if provided, otherwise use saved config
+        if (empty($webhookUrl)) {
+            $webhookUrl = $this->config->getWebhookUrl();
+        }
+
+        // Use form secret if provided, otherwise use saved config
+        if (empty($apiSecret)) {
+            $apiSecret = $this->config->getApiSecret();
+        }
+
+        // Validate we have both required values
+        if (empty($webhookUrl)) {
             return $result->setData([
                 'success' => false,
-                'message' => __('Connection not configured. Please set webhook URL, tenant ID, and API secret.'),
+                'message' => __('Please enter Webhook Endpoint URL.'),
             ]);
         }
 
-        $response = $this->webhookSender->testConnection();
+        if (empty($apiSecret)) {
+            return $result->setData([
+                'success' => false,
+                'message' => __('Please enter API Secret Key.'),
+            ]);
+        }
+
+        // Test connection with credentials
+        $response = $this->webhookSender->testConnectionWithCredentials($webhookUrl, $apiSecret);
+
+        // Extract error message from response body if available
+        $message = __('Connection successful!');
+        if (!$response->isSuccess()) {
+            $body = $response->getBody();
+            if (is_array($body) && isset($body['message'])) {
+                $message = sprintf('[HTTP %d] %s', $response->getStatusCode(), $body['message']);
+            } else {
+                $message = $response->getErrorMessage() ?: sprintf('[HTTP %d] Unknown error', $response->getStatusCode());
+            }
+        }
 
         return $result->setData([
             'success' => $response->isSuccess(),
-            'message' => $response->isSuccess() ? __('Connection successful!') : $response->getErrorMessage(),
+            'message' => $message,
             'latency' => $response->getDurationMs(),
             'status_code' => $response->getStatusCode(),
         ]);
