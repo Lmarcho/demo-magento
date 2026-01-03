@@ -79,6 +79,7 @@ class WebhookSender
     {
         $endpoint = 'batch';
         $payload = [
+            'type' => 'batch',
             'batch_id' => $this->generateBatchId(),
             'timestamp' => gmdate('Y-m-d\TH:i:s\Z'),
             'items' => $items,
@@ -104,6 +105,8 @@ class WebhookSender
         }
 
         $payload = [
+            'type' => $entityType,
+            'action' => $action,
             'timestamp' => gmdate('Y-m-d\TH:i:s\Z'),
             'data' => $data,
         ];
