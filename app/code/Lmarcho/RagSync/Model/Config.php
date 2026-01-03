@@ -214,16 +214,15 @@ class Config
     /**
      * Get full webhook endpoint URL
      *
-     * @param string $endpoint
+     * The URL is used directly as configured - Laravel handles routing based on payload
+     *
+     * @param string $endpoint (kept for backward compatibility, not used)
      * @param int|null $storeId
      * @return string
      */
-    public function getWebhookEndpoint(string $endpoint, ?int $storeId = null): string
+    public function getWebhookEndpoint(string $endpoint = '', ?int $storeId = null): string
     {
-        $baseUrl = $this->getWebhookUrl($storeId);
-        $tenantId = $this->getTenantId($storeId);
-
-        return sprintf('%s/api/webhooks/magento/%s/%s', $baseUrl, $tenantId, ltrim($endpoint, '/'));
+        return $this->getWebhookUrl($storeId);
     }
 
     // ==================== Products Settings ====================
@@ -641,7 +640,6 @@ class Config
     public function isConnectionConfigured(?int $storeId = null): bool
     {
         return !empty($this->getWebhookUrl($storeId))
-            && !empty($this->getTenantId($storeId))
             && !empty($this->getApiSecret($storeId));
     }
 

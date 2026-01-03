@@ -57,16 +57,9 @@
 
                 <field id="webhook_url" translate="label comment" type="text" sortOrder="10"
                        showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Webhook Base URL</label>
+                    <label>Webhook Endpoint URL</label>
                     <validate>validate-url</validate>
-                    <comment>The base URL of your RAG backend (e.g., https://rag-backend.example.com)</comment>
-                </field>
-
-                <field id="tenant_id" translate="label comment" type="text" sortOrder="20"
-                       showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Tenant ID</label>
-                    <validate>required-entry</validate>
-                    <comment>Your unique tenant identifier.</comment>
+                    <comment><![CDATA[The full webhook endpoint URL from your RAG backend (e.g., http://localhost:8000/api/webhooks/magento/your-tenant-uuid)]]></comment>
                 </field>
 
                 <field id="api_secret" translate="label comment" type="obscure" sortOrder="30"

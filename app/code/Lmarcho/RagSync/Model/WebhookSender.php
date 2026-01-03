@@ -114,26 +114,43 @@ class WebhookSender
     /**
      * Test connection to webhook endpoint
      *
+     * Sends a signed POST request to verify both endpoint and API secret key
+     *
      * @param int|null $storeId
      * @return WebhookResponse
      */
     public function testConnection(?int $storeId = null): WebhookResponse
     {
-        $endpoint = 'status';
-
         try {
             $client = $this->createClient($storeId);
-            $url = $this->config->getWebhookEndpoint($endpoint, $storeId);
+            $url = $this->config->getWebhookEndpoint('', $storeId);
+
+            // Create test payload
+            $payload = [
+                'type' => 'connection_test',
+                'timestamp' => gmdate('Y-m-d\TH:i:s\Z'),
+                'test_id' => bin2hex(random_bytes(8)),
+            ];
+
+            $jsonPayload = $this->serializer->serialize($payload);
+            $signature = $this->generateSignature($jsonPayload, $storeId);
+
+            $headers = $this->getHeaders($signature, $storeId);
+            $headers['Content-Type'] = 'application/json';
 
             $startTime = microtime(true);
-            $response = $client->get($url, [
-                'headers' => $this->getHeaders(null, $storeId),
+            $response = $client->post($url, [
+                'headers' => $headers,
+                'body' => $jsonPayload,
             ]);
             $duration = (int)((microtime(true) - $startTime) * 1000);
 
+            $statusCode = $response->getStatusCode();
+            $success = $statusCode >= 200 && $statusCode < 300;
+
             return new WebhookResponse(
-                true,
-                $response->getStatusCode(),
+                $success,
+                $statusCode,
                 $this->parseResponseBody($response),
                 null,
                 $duration
@@ -254,7 +271,7 @@ class WebhookSender
         ];
 
         if ($signature !== null) {
-            $headers['X-Rag-Signature'] = 'sha256=' . $signature;
+            $headers['X-Magento-Webhook-Signature'] = 'sha256=' . $signature;
         }
 
         return $headers;
