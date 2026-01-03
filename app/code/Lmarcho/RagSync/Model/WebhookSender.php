@@ -8,8 +8,8 @@ declare(strict_types=1);
 namespace Lmarcho\RagSync\Model;
 
 use GuzzleHttp\Client;
-use GuzzleHttp\ClientFactory;
 use GuzzleHttp\Exception\GuzzleException;
+use Lmarcho\RagSync\Http\ClientFactory;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Response;
 use Magento\Framework\Serialize\SerializerInterface;

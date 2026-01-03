@@ -86,9 +86,6 @@
         </arguments>
     </virtualType>
 
-    <!-- Guzzle Client Factory -->
-    <preference for="GuzzleHttp\ClientFactory" type="Lmarcho\RagSync\Http\ClientFactory"/>
-
     <!-- UI Component Data Provider -->
     <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
         <arguments>

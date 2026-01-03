@@ -66,7 +66,7 @@ class QueueStatusCommand extends Command
         $output->writeln('');
 
         // Get queue statistics
-        $stats = $this->queueResource->getQueueStats();
+        $stats = $this->queueResource->getStatistics();
 
         // Status breakdown
         $output->writeln('<comment>Queue Status Breakdown:</comment>');
@@ -101,7 +101,7 @@ class QueueStatusCommand extends Command
         // Configuration info
         $output->writeln('<comment>Configuration:</comment>');
         $output->writeln(sprintf('  Webhook URL: %s', $this->config->getWebhookUrl() ?: '<error>Not configured</error>'));
-        $output->writeln(sprintf('  Batch Size: %d', $this->config->getBatchSize()));
+        $output->writeln(sprintf('  Batch Size: %d', $this->config->getQueueBatchSize()));
         $output->writeln(sprintf('  Max Retries: %d', $this->config->getMaxRetries()));
         $output->writeln(sprintf('  Environment: %s', $this->config->getEnvironment()));
 

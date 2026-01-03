@@ -245,7 +245,7 @@ class QueueServiceTest extends TestCase
         $failedItem->setStatus(Queue::STATUS_FAILED);
         $this->queueResource->save($failedItem);
 
-        $stats = $this->queueResource->getQueueStats();
+        $stats = $this->queueResource->getStatistics();
 
         $this->assertArrayHasKey('pending', $stats);
         $this->assertArrayHasKey('sent', $stats);

@@ -1,0 +1,45 @@
+<?php
+/**
+ * @var \Lmarcho\RagSync\Block\Adminhtml\System\Config\TestConnection $block
+ */
+?>
+<div class="ragsync-test-connection">
+    <?= $block->getButtonHtml() ?>
+    <span id="ragsync_test_result" style="margin-left: 10px;"></span>
+</div>
+
+<script type="text/javascript">
+    require(['jquery', 'Magento_Ui/js/modal/alert'], function($, alert) {
+        $('#ragsync_test_connection').click(function() {
+            var $button = $(this);
+            var $result = $('#ragsync_test_result');
+
+            $button.prop('disabled', true);
+            $result.html('<span style="color: #666;">Testing connection...</span>');
+
+            $.ajax({
+                url: '<?= $block->escapeUrl($block->getAjaxUrl()) ?>',
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    form_key: FORM_KEY
+                },
+                success: function(response) {
+                    $button.prop('disabled', false);
+                    if (response.success) {
+                        $result.html('<span style="color: green;">' + response.message + '</span>');
+                        if (response.latency) {
+                            $result.append(' <small style="color: #666;">(Latency: ' + response.latency + 'ms)</small>');
+                        }
+                    } else {
+                        $result.html('<span style="color: red;">' + response.message + '</span>');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    $button.prop('disabled', false);
+                    $result.html('<span style="color: red;">Error: ' + error + '</span>');
+                }
+            });
+        });
+    });
+</script>
