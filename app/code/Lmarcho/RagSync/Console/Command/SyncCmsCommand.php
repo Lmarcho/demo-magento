@@ -14,6 +14,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Magento\Cms\Model\ResourceModel\Page\CollectionFactory as PageCollectionFactory;
 use Magento\Cms\Model\ResourceModel\Block\CollectionFactory as BlockCollectionFactory;
 use Lmarcho\RagSync\Model\Config;
+use Lmarcho\RagSync\Model\Queue;
 use Lmarcho\RagSync\Model\QueueService;
 use Psr\Log\LoggerInterface;
 
@@ -169,18 +170,18 @@ class SyncCmsCommand extends Command
             if (is_array($stores)) {
                 foreach ($stores as $store) {
                     $this->queueService->addToQueue(
-                        'cms_page',
+                        Queue::ENTITY_TYPE_CMS_PAGE,
                         (int)$page->getId(),
                         (int)$store,
-                        'upsert'
+                        Queue::ACTION_SAVE
                     );
                 }
             } else {
                 $this->queueService->addToQueue(
-                    'cms_page',
+                    Queue::ENTITY_TYPE_CMS_PAGE,
                     (int)$page->getId(),
                     (int)($storeId ?? 0),
-                    'upsert'
+                    Queue::ACTION_SAVE
                 );
             }
             $count++;
@@ -212,18 +213,18 @@ class SyncCmsCommand extends Command
             if (is_array($stores)) {
                 foreach ($stores as $store) {
                     $this->queueService->addToQueue(
-                        'cms_block',
+                        Queue::ENTITY_TYPE_CMS_BLOCK,
                         (int)$block->getId(),
                         (int)$store,
-                        'upsert'
+                        Queue::ACTION_SAVE
                     );
                 }
             } else {
                 $this->queueService->addToQueue(
-                    'cms_block',
+                    Queue::ENTITY_TYPE_CMS_BLOCK,
                     (int)$block->getId(),
                     (int)($storeId ?? 0),
-                    'upsert'
+                    Queue::ACTION_SAVE
                 );
             }
             $count++;

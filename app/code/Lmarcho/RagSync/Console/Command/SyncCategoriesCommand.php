@@ -13,6 +13,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory as CategoryCollectionFactory;
 use Lmarcho\RagSync\Model\Config;
+use Lmarcho\RagSync\Model\Queue;
 use Lmarcho\RagSync\Model\QueueService;
 use Psr\Log\LoggerInterface;
 
@@ -123,10 +124,10 @@ class SyncCategoriesCommand extends Command
             $count = 0;
             foreach ($collection as $category) {
                 $this->queueService->addToQueue(
-                    'category',
+                    Queue::ENTITY_TYPE_CATEGORY,
                     (int)$category->getId(),
                     (int)($storeId ?? $category->getStoreId()),
-                    'upsert'
+                    Queue::ACTION_SAVE
                 );
                 $count++;
             }

@@ -19,7 +19,7 @@ class ActionOptions implements OptionSourceInterface
     public function toOptionArray(): array
     {
         return [
-            ['value' => 'upsert', 'label' => __('Upsert')],
+            ['value' => 'save', 'label' => __('Save/Update')],
             ['value' => 'delete', 'label' => __('Delete')],
         ];
     }

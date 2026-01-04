@@ -60,7 +60,15 @@ class CmsBlockSaveObserver implements ObserverInterface
             $storeIds = [$storeIds];
         }
 
-        $storeId = in_array(0, $storeIds) ? 0 : (int)reset($storeIds);
-        $this->queueService->queueCmsBlock((int)$block->getId(), $storeId);
+        // If assigned to "All Store Views" (store 0), queue once with store 0
+        if (in_array(0, $storeIds, false)) {
+            $this->queueService->queueCmsBlock((int)$block->getId(), 0);
+            return;
+        }
+
+        // Queue for each assigned store to capture store-specific content
+        foreach ($storeIds as $storeId) {
+            $this->queueService->queueCmsBlock((int)$block->getId(), (int)$storeId);
+        }
     }
 }

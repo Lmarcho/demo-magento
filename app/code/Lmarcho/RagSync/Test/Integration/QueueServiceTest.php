@@ -57,7 +57,7 @@ class QueueServiceTest extends TestCase
         $entityType = 'product';
         $entityId = 12345;
         $storeId = 1;
-        $action = 'upsert';
+        $action = Queue::ACTION_SAVE;
 
         $this->queueService->addToQueue($entityType, $entityId, $storeId, $action);
 
@@ -84,8 +84,8 @@ class QueueServiceTest extends TestCase
         $storeId = 1;
 
         // Add same item twice
-        $this->queueService->addToQueue($entityType, $entityId, $storeId, 'upsert');
-        $this->queueService->addToQueue($entityType, $entityId, $storeId, 'upsert');
+        $this->queueService->addToQueue($entityType, $entityId, $storeId, Queue::ACTION_SAVE);
+        $this->queueService->addToQueue($entityType, $entityId, $storeId, Queue::ACTION_SAVE);
 
         $collection = $this->collectionFactory->create();
         $collection->addFieldToFilter('entity_type', $entityType)
@@ -102,12 +102,12 @@ class QueueServiceTest extends TestCase
     public function testAddToQueueSetsCorrectPriority(): void
     {
         // Test product priority
-        $this->queueService->addToQueue('product', 1001, 1, 'upsert');
+        $this->queueService->addToQueue('product', 1001, 1, Queue::ACTION_SAVE);
         $productItem = $this->getQueueItem('product', 1001, 1);
         $this->assertEquals(2, $productItem->getPriority());
 
         // Test CMS page priority
-        $this->queueService->addToQueue('cms_page', 1002, 1, 'upsert');
+        $this->queueService->addToQueue('cms_page', 1002, 1, Queue::ACTION_SAVE);
         $cmsPageItem = $this->getQueueItem('cms_page', 1002, 1);
         $this->assertEquals(3, $cmsPageItem->getPriority());
 
@@ -122,7 +122,7 @@ class QueueServiceTest extends TestCase
      */
     public function testAddToQueueDoesNothingWhenDisabled(): void
     {
-        $this->queueService->addToQueue('product', 99999, 1, 'upsert');
+        $this->queueService->addToQueue('product', 99999, 1, Queue::ACTION_SAVE);
 
         $collection = $this->collectionFactory->create();
         $collection->addFieldToFilter('entity_id', 99999);
@@ -136,9 +136,9 @@ class QueueServiceTest extends TestCase
     public function testGetPendingItemsReturnsCorrectItems(): void
     {
         // Add items with different statuses
-        $this->queueService->addToQueue('product', 2001, 1, 'upsert');
-        $this->queueService->addToQueue('product', 2002, 1, 'upsert');
-        $this->queueService->addToQueue('product', 2003, 1, 'upsert');
+        $this->queueService->addToQueue('product', 2001, 1, Queue::ACTION_SAVE);
+        $this->queueService->addToQueue('product', 2002, 1, Queue::ACTION_SAVE);
+        $this->queueService->addToQueue('product', 2003, 1, Queue::ACTION_SAVE);
 
         // Mark one as sent
         $sentItem = $this->getQueueItem('product', 2002, 1);
@@ -161,7 +161,7 @@ class QueueServiceTest extends TestCase
      */
     public function testMarkAsSentUpdatesStatus(): void
     {
-        $this->queueService->addToQueue('product', 3001, 1, 'upsert');
+        $this->queueService->addToQueue('product', 3001, 1, Queue::ACTION_SAVE);
 
         $item = $this->getQueueItem('product', 3001, 1);
         $queueId = $item->getId();
@@ -180,7 +180,7 @@ class QueueServiceTest extends TestCase
      */
     public function testMarkAsFailedUpdatesStatusAndError(): void
     {
-        $this->queueService->addToQueue('product', 4001, 1, 'upsert');
+        $this->queueService->addToQueue('product', 4001, 1, Queue::ACTION_SAVE);
 
         $item = $this->getQueueItem('product', 4001, 1);
         $queueId = $item->getId();
@@ -202,7 +202,7 @@ class QueueServiceTest extends TestCase
     public function testCleanupOldItems(): void
     {
         // Add an item and mark as sent
-        $this->queueService->addToQueue('product', 5001, 1, 'upsert');
+        $this->queueService->addToQueue('product', 5001, 1, Queue::ACTION_SAVE);
         $item = $this->getQueueItem('product', 5001, 1);
         $item->setStatus(Queue::STATUS_SENT);
 
@@ -231,9 +231,9 @@ class QueueServiceTest extends TestCase
     public function testGetQueueStatsReturnsCorrectCounts(): void
     {
         // Add items with different statuses
-        $this->queueService->addToQueue('product', 6001, 1, 'upsert');
-        $this->queueService->addToQueue('product', 6002, 1, 'upsert');
-        $this->queueService->addToQueue('product', 6003, 1, 'upsert');
+        $this->queueService->addToQueue('product', 6001, 1, Queue::ACTION_SAVE);
+        $this->queueService->addToQueue('product', 6002, 1, Queue::ACTION_SAVE);
+        $this->queueService->addToQueue('product', 6003, 1, Queue::ACTION_SAVE);
 
         // Mark one as sent
         $sentItem = $this->getQueueItem('product', 6002, 1);

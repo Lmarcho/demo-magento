@@ -14,6 +14,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Magento\SalesRule\Model\ResourceModel\Rule\CollectionFactory as CartRuleCollectionFactory;
 use Magento\CatalogRule\Model\ResourceModel\Rule\CollectionFactory as CatalogRuleCollectionFactory;
 use Lmarcho\RagSync\Model\Config;
+use Lmarcho\RagSync\Model\Queue;
 use Lmarcho\RagSync\Model\QueueService;
 use Psr\Log\LoggerInterface;
 
@@ -102,7 +103,6 @@ class SyncPromotionsCommand extends Command
         }
 
         $type = $input->getOption('type');
-        $ruleTypes = $this->config->getPromotionRuleTypes();
 
         $output->writeln('<info>Starting promotion sync...</info>');
 
@@ -110,11 +110,11 @@ class SyncPromotionsCommand extends Command
             $cartRuleCount = 0;
             $catalogRuleCount = 0;
 
-            if (($type === 'all' || $type === 'cart') && in_array('cart', $ruleTypes)) {
+            if (($type === 'all' || $type === 'cart') && $this->config->shouldSyncCartRules()) {
                 $cartRuleCount = $this->syncCartRules($output);
             }
 
-            if (($type === 'all' || $type === 'catalog') && in_array('catalog', $ruleTypes)) {
+            if (($type === 'all' || $type === 'catalog') && $this->config->shouldSyncCatalogRules()) {
                 $catalogRuleCount = $this->syncCatalogRules($output);
             }
 
@@ -161,10 +161,10 @@ class SyncPromotionsCommand extends Command
         $count = 0;
         foreach ($collection as $rule) {
             $this->queueService->addToQueue(
-                'cart_rule',
+                Queue::ENTITY_TYPE_PROMOTION,
                 (int)$rule->getId(),
                 0,
-                'upsert'
+                Queue::ACTION_SAVE
             );
             $count++;
         }
@@ -197,10 +197,10 @@ class SyncPromotionsCommand extends Command
         $count = 0;
         foreach ($collection as $rule) {
             $this->queueService->addToQueue(
-                'catalog_rule',
+                Queue::ENTITY_TYPE_CATALOG_RULE,
                 (int)$rule->getId(),
                 0,
-                'upsert'
+                Queue::ACTION_SAVE
             );
             $count++;
         }

@@ -23,7 +23,7 @@ class EntityTypeOptions implements OptionSourceInterface
             ['value' => 'cms_page', 'label' => __('CMS Page')],
             ['value' => 'cms_block', 'label' => __('CMS Block')],
             ['value' => 'category', 'label' => __('Category')],
-            ['value' => 'cart_rule', 'label' => __('Cart Rule')],
+            ['value' => 'promotion', 'label' => __('Cart Rule')],
             ['value' => 'catalog_rule', 'label' => __('Catalog Rule')],
         ];
     }

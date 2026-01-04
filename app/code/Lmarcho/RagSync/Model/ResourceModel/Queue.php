@@ -74,15 +74,17 @@ class Queue extends AbstractDb
             'priority' => $priority,
             'status' => QueueModel::STATUS_PENDING,
             'attempts' => 0,
+            'error_message' => null,
             'created_at' => $now,
             'updated_at' => $now,
         ];
 
         // Use INSERT ... ON DUPLICATE KEY UPDATE for deduplication
+        // Reset attempts and error_message so previously failed items can be retried fresh
         $connection->insertOnDuplicate(
             $table,
             $data,
-            ['updated_at', 'status', 'priority'] // Fields to update on duplicate
+            ['updated_at', 'status', 'priority', 'attempts', 'error_message']
         );
 
         // Get the ID of the record
@@ -306,7 +308,8 @@ class Queue extends AbstractDb
     {
         $connection = $this->getConnection();
         $table = $this->getMainTable();
-        $cutoffDate = date('Y-m-d H:i:s', strtotime("-{$days} days"));
+        $cutoffTimestamp = $this->dateTime->gmtTimestamp() - ($days * 86400);
+        $cutoffDate = date('Y-m-d H:i:s', $cutoffTimestamp);
 
         return $connection->delete(
             $table,
@@ -384,7 +387,8 @@ class Queue extends AbstractDb
     {
         $connection = $this->getConnection();
         $table = $this->getMainTable();
-        $cutoffDate = date('Y-m-d H:i:s', strtotime("-{$minutes} minutes"));
+        $cutoffTimestamp = $this->dateTime->gmtTimestamp() - ($minutes * 60);
+        $cutoffDate = date('Y-m-d H:i:s', $cutoffTimestamp);
 
         return $connection->update(
             $table,

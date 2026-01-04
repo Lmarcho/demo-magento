@@ -13,6 +13,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory as ProductCollectionFactory;
 use Lmarcho\RagSync\Model\Config;
+use Lmarcho\RagSync\Model\Queue;
 use Lmarcho\RagSync\Model\QueueService;
 use Psr\Log\LoggerInterface;
 
@@ -133,10 +134,10 @@ class SyncProductsCommand extends Command
 
                 foreach ($collection as $product) {
                     $this->queueService->addToQueue(
-                        'product',
+                        Queue::ENTITY_TYPE_PRODUCT,
                         (int)$product->getId(),
                         (int)($storeId ?? $product->getStoreId()),
-                        'upsert'
+                        Queue::ACTION_SAVE
                     );
                     $processedCount++;
                 }

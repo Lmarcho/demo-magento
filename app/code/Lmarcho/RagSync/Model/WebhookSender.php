@@ -286,7 +286,6 @@ class WebhookSender
         $headers = [
             'User-Agent' => self::USER_AGENT,
             'Accept' => 'application/json',
-            'X-Tenant-Id' => $this->config->getTenantId($storeId),
             'X-Environment' => $this->config->getEnvironment(),
         ];
 

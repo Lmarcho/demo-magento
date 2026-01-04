@@ -95,7 +95,7 @@ class ProductBuilder
             'meta_keywords' => $product->getMetaKeyword(),
             'status' => (int)$product->getStatus(),
             'visibility' => (int)$product->getVisibility(),
-            'categories' => $this->getCategoryNames($product),
+            'categories' => $this->getCategoryNames($product, $storeId),
             'category_ids' => array_map('intval', $product->getCategoryIds() ?: []),
             'attributes' => $this->getCustomAttributes($product, $storeId),
             'image_alt_texts' => $this->getImageAltTexts($product),
@@ -118,9 +118,10 @@ class ProductBuilder
      * Get category names for product
      *
      * @param ProductInterface $product
+     * @param int $storeId
      * @return array
      */
-    private function getCategoryNames(ProductInterface $product): array
+    private function getCategoryNames(ProductInterface $product, int $storeId = 0): array
     {
         $categoryIds = $product->getCategoryIds();
 
@@ -128,7 +129,7 @@ class ProductBuilder
             return [];
         }
 
-        $excludedIds = $this->config->getExcludedCategoryIds();
+        $excludedIds = $this->config->getExcludedCategoryIds($storeId);
         $categoryIds = array_diff($categoryIds, $excludedIds);
 
         if (empty($categoryIds)) {

@@ -97,7 +97,7 @@ class WebhookSenderTest extends TestCase
     public function testSignatureVerification(): void
     {
         // Test that we can verify signatures
-        $payload = '{"action":"upsert","data":{"sku":"TEST123"}}';
+        $payload = '{"action":"save","data":{"sku":"TEST123"}}';
         $secret = 'webhook-secret';
 
         $signature = 'sha256=' . hash_hmac('sha256', $payload, $secret);

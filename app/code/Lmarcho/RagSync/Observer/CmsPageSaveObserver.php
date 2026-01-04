@@ -60,8 +60,15 @@ class CmsPageSaveObserver implements ObserverInterface
             $storeIds = [$storeIds];
         }
 
-        // Queue for each store (or default store 0 for all stores)
-        $storeId = in_array(0, $storeIds) ? 0 : (int)reset($storeIds);
-        $this->queueService->queueCmsPage((int)$page->getId(), $storeId);
+        // If assigned to "All Store Views" (store 0), queue once with store 0
+        if (in_array(0, $storeIds, false)) {
+            $this->queueService->queueCmsPage((int)$page->getId(), 0);
+            return;
+        }
+
+        // Queue for each assigned store to capture store-specific content
+        foreach ($storeIds as $storeId) {
+            $this->queueService->queueCmsPage((int)$page->getId(), (int)$storeId);
+        }
     }
 }

@@ -193,7 +193,7 @@ class CircuitBreaker
     }
 
     /**
-     * Get circuit status for dashboard
+     * Get circuit status for dashboard (read-only, no state changes)
      *
      * @return array
      */
@@ -206,10 +206,31 @@ class CircuitBreaker
             'failure_count' => (int)$state['failure_count'],
             'last_failure_at' => $state['last_failure_at'],
             'opened_at' => $state['opened_at'],
-            'is_available' => $this->isAvailable(),
+            'is_available' => $this->checkAvailability($state),
             'threshold' => $this->failureThreshold,
             'recovery_timeout' => $this->recoveryTimeout,
         ];
+    }
+
+    /**
+     * Check availability without changing state (read-only)
+     *
+     * @param array $state
+     * @return bool
+     */
+    private function checkAvailability(array $state): bool
+    {
+        if ($state['state'] === self::STATE_CLOSED) {
+            return true;
+        }
+
+        if ($state['state'] === self::STATE_OPEN) {
+            // Check if recovery timeout has passed (but don't transition)
+            return $this->hasRecoveryTimeoutPassed($state);
+        }
+
+        // Half-open state
+        return true;
     }
 
     /**

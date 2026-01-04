@@ -112,7 +112,8 @@ class CategoryBuilder
     {
         $pathIds = explode('/', $category->getPath());
 
-        // Remove root category (ID 1) and store root category (ID 2)
+        // Remove root category (level 0) and store root category (level 1)
+        // These are always the first 2 elements in the path regardless of their IDs
         $pathIds = array_slice($pathIds, 2);
 
         if (empty($pathIds)) {
@@ -142,7 +143,8 @@ class CategoryBuilder
     {
         $pathIds = explode('/', $category->getPath());
 
-        // Remove root category (ID 1), store root (ID 2), and current category
+        // Remove root category (level 0), store root (level 1), and current category
+        // First 2 elements are always root categories regardless of their IDs
         $pathIds = array_slice($pathIds, 2, -1);
 
         if (empty($pathIds)) {

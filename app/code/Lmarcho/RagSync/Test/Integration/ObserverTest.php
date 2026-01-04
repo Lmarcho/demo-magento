@@ -89,7 +89,7 @@ class ObserverTest extends TestCase
 
         $queueItem = $collection->getFirstItem();
         $this->assertEquals(Queue::STATUS_PENDING, $queueItem->getStatus());
-        $this->assertEquals('upsert', $queueItem->getAction());
+        $this->assertEquals(Queue::ACTION_SAVE, $queueItem->getAction());
     }
 
     /**

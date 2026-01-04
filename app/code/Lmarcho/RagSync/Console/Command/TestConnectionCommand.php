@@ -97,20 +97,14 @@ class TestConnectionCommand extends Command
         $output->writeln('<info>Sending test ping...</info>');
 
         try {
-            $testPayload = [
-                'type' => 'ping',
-                'timestamp' => date('c'),
-                'source' => 'magento_cli',
-            ];
-
-            $response = $this->webhookSender->send($testPayload, 'ping');
+            $response = $this->webhookSender->testConnection();
 
             if ($response->isSuccess()) {
                 $output->writeln('<info>✓ Connection successful!</info>');
                 $output->writeln(sprintf('  Response code: %d', $response->getStatusCode()));
-                $output->writeln(sprintf('  Response time: %.2fms', $response->getResponseTime() * 1000));
+                $output->writeln(sprintf('  Response time: %dms', $response->getDurationMs()));
 
-                $responseData = $response->getData();
+                $responseData = $response->getBody();
                 if (!empty($responseData)) {
                     $output->writeln('  Response data:');
                     foreach ($responseData as $key => $value) {
@@ -124,7 +118,7 @@ class TestConnectionCommand extends Command
             } else {
                 $output->writeln('<error>✗ Connection failed!</error>');
                 $output->writeln(sprintf('  Status code: %d', $response->getStatusCode()));
-                $output->writeln(sprintf('  Error: %s', $response->getError()));
+                $output->writeln(sprintf('  Error: %s', $response->getErrorMessage()));
 
                 return Command::FAILURE;
             }

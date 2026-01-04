@@ -190,7 +190,7 @@ bin/magento ragsync:test:connection
 {
   "type": "product",
   "id": "123",
-  "action": "upsert",
+  "action": "save",
   "store_id": 1,
   "timestamp": "2026-01-02T10:30:00Z",
   "data": {
@@ -210,12 +210,12 @@ bin/magento ragsync:test:connection
 
 ```json
 {
-  "batch_id": "uuid-v4",
+  "type": "batch",
+  "batch_id": "mag-20260102103000-abcd1234",
   "timestamp": "2026-01-02T10:30:00Z",
-  "tenant_id": "your-tenant",
   "items": [
-    { "type": "product", "id": "1", "action": "upsert", "data": {...} },
-    { "type": "product", "id": "2", "action": "upsert", "data": {...} }
+    { "type": "product", "id": "1", "action": "save", "store_id": 1, "data": {...} },
+    { "type": "product", "id": "2", "action": "save", "store_id": 1, "data": {...} }
   ]
 }
 ```
@@ -224,10 +224,10 @@ bin/magento ragsync:test:connection
 
 | Header | Description |
 |--------|-------------|
-| `X-Rag-Signature` | HMAC-SHA256 signature (`sha256=...`) |
-| `X-Rag-Tenant` | Tenant identifier |
-| `X-Rag-Timestamp` | Request timestamp |
+| `X-Magento-Webhook-Signature` | HMAC-SHA256 signature (`sha256=<hex>`) |
+| `X-Environment` | Environment identifier (`production` or `staging`) |
 | `Content-Type` | `application/json` |
+| `User-Agent` | `Magento-RagSync/1.0` |
 
 ## Queue States
 
