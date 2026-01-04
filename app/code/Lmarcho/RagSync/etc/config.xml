@@ -78,6 +78,13 @@
                 <categories_cron>0 3 * * *</categories_cron>
                 <promotions_cron>0 * * * *</promotions_cron>
             </schedule>
+
+            <!-- Chat Widget Settings -->
+            <chat_widget>
+                <enabled>0</enabled>
+                <exclude_pages>checkout_index_index,checkout_cart_index</exclude_pages>
+                <send_customer_context>1</send_customer_context>
+            </chat_widget>
         </rag_sync>
     </default>
 </config>

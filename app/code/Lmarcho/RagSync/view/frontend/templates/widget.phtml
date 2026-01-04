@@ -1,0 +1,53 @@
+<?php
+/**
+ * Lmarcho RagSync Module - Chat Widget Template
+ *
+ * @var \Magento\Framework\View\Element\Template $block
+ * @var \Lmarcho\RagSync\ViewModel\WidgetConfig $viewModel
+ */
+
+$viewModel = $block->getData('view_model');
+
+if (!$viewModel->shouldDisplay()) {
+    return;
+}
+
+$scriptUrl = $viewModel->getScriptUrl();
+if (empty($scriptUrl)) {
+    return;
+}
+
+$configJson = $viewModel->getWidgetConfigJson();
+?>
+<div id="rag-chat-widget" data-config="<?= $block->escapeHtmlAttr($configJson) ?>"></div>
+<script>
+(function() {
+    'use strict';
+
+    var widgetContainer = document.getElementById('rag-chat-widget');
+    if (!widgetContainer) {
+        return;
+    }
+
+    var config = {};
+    try {
+        config = JSON.parse(widgetContainer.getAttribute('data-config') || '{}');
+    } catch (e) {
+        console.error('RAG Widget: Failed to parse config', e);
+        return;
+    }
+
+    // Set global config for the widget script to read
+    window.RAG_WIDGET_CONFIG = config;
+
+    // Load the widget script
+    var script = document.createElement('script');
+    script.src = <?= /* @noEscape */ json_encode($scriptUrl) ?>;
+    script.async = true;
+    script.defer = true;
+    script.onerror = function() {
+        console.error('RAG Widget: Failed to load widget script');
+    };
+    document.body.appendChild(script);
+})();
+</script>

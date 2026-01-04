@@ -330,6 +330,38 @@
                     <comment>Cron expression (default: 0 * * * * = every hour)</comment>
                 </field>
             </group>
+
+            <!-- Chat Widget Settings -->
+            <group id="chat_widget" translate="label" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Chat Widget</label>
+                <comment><![CDATA[Configure the AI-powered chat widget displayed on storefront pages.]]></comment>
+
+                <field id="enabled" translate="label comment" type="select" sortOrder="10"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Chat Widget</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Display the RAG-powered chat widget on the storefront.</comment>
+                </field>
+
+                <field id="exclude_pages" translate="label comment" type="textarea" sortOrder="20"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Exclude Page Handles</label>
+                    <comment><![CDATA[Comma-separated layout handles to exclude (e.g., checkout_index_index,checkout_cart_index). Widget won't appear on these pages.]]></comment>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+
+                <field id="send_customer_context" translate="label comment" type="select" sortOrder="30"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Send Customer Context</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Include customer group and logged-in status for personalized responses.</comment>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+            </group>
         </section>
     </system>
 </config>

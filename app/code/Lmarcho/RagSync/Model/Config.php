@@ -68,6 +68,16 @@ class Config
     private const XML_PATH_SCHEDULE_CATEGORIES = 'schedule/categories_cron';
     private const XML_PATH_SCHEDULE_PROMOTIONS = 'schedule/promotions_cron';
 
+    // Chat Widget Settings
+    private const XML_PATH_WIDGET_ENABLED = 'chat_widget/enabled';
+    private const XML_PATH_WIDGET_EXCLUDE_PAGES = 'chat_widget/exclude_pages';
+    private const XML_PATH_WIDGET_CUSTOMER_CONTEXT = 'chat_widget/send_customer_context';
+
+    // Widget URLs (derived from webhook URL)
+    private const WIDGET_SCRIPT_PATH = '/widget/loader.js';
+    private const WIDGET_CONFIG_PATH = '/widget/config';
+    private const WIDGET_API_PATH = '/api/chat';
+
     /**
      * @var ScopeConfigInterface
      */
@@ -611,6 +621,108 @@ class Config
     public function getPromotionsSyncCron(): string
     {
         return (string)($this->getValue(self::XML_PATH_SCHEDULE_PROMOTIONS) ?: '0 * * * *');
+    }
+
+    // ==================== Chat Widget Settings ====================
+
+    /**
+     * Check if chat widget is enabled
+     *
+     * @param int|null $storeId
+     * @return bool
+     */
+    public function isWidgetEnabled(?int $storeId = null): bool
+    {
+        return $this->isEnabled($storeId) && $this->getFlag(self::XML_PATH_WIDGET_ENABLED, $storeId);
+    }
+
+    /**
+     * Get excluded page handles for widget
+     *
+     * @param int|null $storeId
+     * @return array
+     */
+    public function getWidgetExcludePages(?int $storeId = null): array
+    {
+        $value = (string)$this->getValue(self::XML_PATH_WIDGET_EXCLUDE_PAGES, $storeId);
+        return $this->parseCommaSeparated($value);
+    }
+
+    /**
+     * Check if customer context should be sent to widget
+     *
+     * @param int|null $storeId
+     * @return bool
+     */
+    public function isWidgetCustomerContextEnabled(?int $storeId = null): bool
+    {
+        return $this->getFlag(self::XML_PATH_WIDGET_CUSTOMER_CONTEXT, $storeId);
+    }
+
+    /**
+     * Get widget script URL
+     *
+     * Derives the widget URL from the configured webhook URL base
+     *
+     * @param int|null $storeId
+     * @return string
+     */
+    public function getWidgetScriptUrl(?int $storeId = null): string
+    {
+        $baseUrl = $this->getWidgetBaseUrl($storeId);
+        return $baseUrl ? $baseUrl . self::WIDGET_SCRIPT_PATH : '';
+    }
+
+    /**
+     * Get widget config endpoint URL
+     *
+     * @param int|null $storeId
+     * @return string
+     */
+    public function getWidgetConfigUrl(?int $storeId = null): string
+    {
+        $baseUrl = $this->getWidgetBaseUrl($storeId);
+        return $baseUrl ? $baseUrl . self::WIDGET_CONFIG_PATH : '';
+    }
+
+    /**
+     * Get widget API endpoint URL
+     *
+     * @param int|null $storeId
+     * @return string
+     */
+    public function getWidgetApiUrl(?int $storeId = null): string
+    {
+        $baseUrl = $this->getWidgetBaseUrl($storeId);
+        return $baseUrl ? $baseUrl . self::WIDGET_API_PATH : '';
+    }
+
+    /**
+     * Get widget base URL from webhook URL
+     *
+     * Extracts scheme://host from the webhook URL
+     *
+     * @param int|null $storeId
+     * @return string
+     */
+    private function getWidgetBaseUrl(?int $storeId = null): string
+    {
+        $webhookUrl = $this->getWebhookUrl($storeId);
+        if (empty($webhookUrl)) {
+            return '';
+        }
+
+        $parsed = parse_url($webhookUrl);
+        if (!isset($parsed['scheme'], $parsed['host'])) {
+            return '';
+        }
+
+        $baseUrl = $parsed['scheme'] . '://' . $parsed['host'];
+        if (isset($parsed['port'])) {
+            $baseUrl .= ':' . $parsed['port'];
+        }
+
+        return $baseUrl;
     }
 
     // ==================== Helper Methods ====================

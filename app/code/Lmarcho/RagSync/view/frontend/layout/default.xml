@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Lmarcho RagSync Module - Frontend Layout
+ *
+ * Injects the RAG chat widget on all frontend pages
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="before.body.end">
+            <block class="Magento\Framework\View\Element\Template"
+                   name="ragsync.chat.widget"
+                   template="Lmarcho_RagSync::widget.phtml"
+                   ifconfig="rag_sync/chat_widget/enabled">
+                <arguments>
+                    <argument name="view_model" xsi:type="object">Lmarcho\RagSync\ViewModel\WidgetConfig</argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+    </body>
+</page>

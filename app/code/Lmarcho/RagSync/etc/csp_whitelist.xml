@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Lmarcho RagSync Module - Content Security Policy Whitelist
+ *
+ * Allows loading the RAG chat widget script and API connections
+ */
+-->
+<csp_whitelist xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Csp:etc/csp_whitelist.xsd">
+    <policies>
+        <!-- Allow loading widget script -->
+        <policy id="script-src">
+            <values>
+                <value id="rag_widget_script" type="host">rag.lmarcho.com</value>
+            </values>
+        </policy>
+
+        <!-- Allow XHR/fetch to RAG API -->
+        <policy id="connect-src">
+            <values>
+                <value id="rag_api_connect" type="host">rag.lmarcho.com</value>
+            </values>
+        </policy>
+
+        <!-- Allow widget styles (if any inline styles) -->
+        <policy id="style-src">
+            <values>
+                <value id="rag_widget_style" type="host">rag.lmarcho.com</value>
+            </values>
+        </policy>
+
+        <!-- Allow widget fonts (if any) -->
+        <policy id="font-src">
+            <values>
+                <value id="rag_widget_font" type="host">rag.lmarcho.com</value>
+            </values>
+        </policy>
+
+        <!-- Allow widget images (if any) -->
+        <policy id="img-src">
+            <values>
+                <value id="rag_widget_img" type="host">rag.lmarcho.com</value>
+            </values>
+        </policy>
+
+        <!-- Allow iframe if widget uses one -->
+        <policy id="frame-src">
+            <values>
+                <value id="rag_widget_frame" type="host">rag.lmarcho.com</value>
+            </values>
+        </policy>
+    </policies>
+</csp_whitelist>
