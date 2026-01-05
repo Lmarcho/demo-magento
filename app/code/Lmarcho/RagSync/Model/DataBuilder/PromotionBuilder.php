@@ -9,8 +9,10 @@ namespace Lmarcho\RagSync\Model\DataBuilder;
 
 use Magento\SalesRule\Api\Data\RuleInterface as CartRuleInterface;
 use Magento\SalesRule\Api\RuleRepositoryInterface as CartRuleRepositoryInterface;
+use Magento\SalesRule\Model\Rule as CartRuleModel;
 use Magento\CatalogRule\Api\Data\RuleInterface as CatalogRuleInterface;
 use Magento\CatalogRule\Api\CatalogRuleRepositoryInterface;
+use Magento\CatalogRule\Model\Rule as CatalogRuleModel;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Stdlib\DateTime\DateTime;
 use Lmarcho\RagSync\Model\Config;
@@ -292,11 +294,11 @@ class PromotionBuilder
     /**
      * Check if cart rule should be synced based on config
      *
-     * @param CartRuleInterface $rule
+     * @param CartRuleInterface|CartRuleModel $rule
      * @param int|null $storeId
      * @return bool
      */
-    public function shouldSyncCartRule(CartRuleInterface $rule, ?int $storeId = null): bool
+    public function shouldSyncCartRule(CartRuleInterface|CartRuleModel $rule, ?int $storeId = null): bool
     {
         if (!$this->config->isPromotionSyncEnabled($storeId)) {
             return false;
@@ -326,11 +328,11 @@ class PromotionBuilder
     /**
      * Check if catalog rule should be synced based on config
      *
-     * @param CatalogRuleInterface $rule
+     * @param CatalogRuleInterface|CatalogRuleModel $rule
      * @param int|null $storeId
      * @return bool
      */
-    public function shouldSyncCatalogRule(CatalogRuleInterface $rule, ?int $storeId = null): bool
+    public function shouldSyncCatalogRule(CatalogRuleInterface|CatalogRuleModel $rule, ?int $storeId = null): bool
     {
         if (!$this->config->isPromotionSyncEnabled($storeId)) {
             return false;
