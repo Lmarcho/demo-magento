@@ -209,21 +209,33 @@ class WidgetConfig implements ArgumentInterface
      */
     public function getChatSessionJson(): string
     {
+        $isLoggedIn = $this->customerSession->isLoggedIn();
+        $guestSessionId = $this->cookieManager->getCookie(self::CHAT_SESSION_COOKIE);
+
         $session = [
             'sessionId' => $this->getChatSessionId(),
             'customerId' => null,
             'customerEmail' => null,
             'customerName' => null,
-            'isLoggedIn' => $this->customerSession->isLoggedIn(),
+            'isLoggedIn' => $isLoggedIn,
             'storeId' => $this->getStoreId(),
+            'previousGuestSessionId' => null,
         ];
 
-        if ($this->customerSession->isLoggedIn()) {
+        if ($isLoggedIn) {
             $customer = $this->customerSession->getCustomer();
             $session['customerId'] = (int)$customer->getId();
             $session['customerEmail'] = $customer->getEmail();
             $session['customerName'] = trim($customer->getFirstname() . ' ' . $customer->getLastname());
             $session['customerGroupId'] = (int)$this->customerSession->getCustomerGroupId();
+
+            // If logged-in user still has a guest cookie, include it for session merging
+            // Laravel can use this to merge guest conversation history into customer account
+            if (!empty($guestSessionId) && strpos($guestSessionId, 'guest_') === 0) {
+                $session['previousGuestSessionId'] = $guestSessionId;
+                // Clear the guest cookie since user is now logged in
+                $this->clearGuestSessionCookie();
+            }
         }
 
         return json_encode($session, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
@@ -319,6 +331,25 @@ class WidgetConfig implements ArgumentInterface
             return $this->storeManager->getStore()->isCurrentlySecure();
         } catch (\Exception $e) {
             return false;
+        }
+    }
+
+    /**
+     * Clear guest session cookie after merging to customer session
+     *
+     * @return void
+     */
+    private function clearGuestSessionCookie(): void
+    {
+        try {
+            $metadata = $this->cookieMetadataFactory
+                ->createPublicCookieMetadata()
+                ->setPath($this->sessionManager->getCookiePath())
+                ->setDomain($this->sessionManager->getCookieDomain());
+
+            $this->cookieManager->deleteCookie(self::CHAT_SESSION_COOKIE, $metadata);
+        } catch (\Exception $e) {
+            // Cookie deletion failed, not critical
         }
     }
 
