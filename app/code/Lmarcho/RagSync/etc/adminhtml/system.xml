@@ -356,7 +356,7 @@
                        showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Widget API Key</label>
                     <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
-                    <comment>API key for widget authentication (rag_xxx format from Laravel backend).</comment>
+                    <comment>API key for widget authentication (wgt_xxx format from Laravel backend).</comment>
                     <depends>
                         <field id="enabled">1</field>
                     </depends>
