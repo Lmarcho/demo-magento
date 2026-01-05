@@ -11,6 +11,8 @@ use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory as CategoryCollectionFactory;
+use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
+use Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable as ConfigurableResource;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Store\Model\StoreManagerInterface;
 use Lmarcho\RagSync\Model\Config;
@@ -38,21 +40,37 @@ class ProductBuilder
     private Config $config;
 
     /**
+     * @var Configurable
+     */
+    private Configurable $configurableType;
+
+    /**
+     * @var ConfigurableResource
+     */
+    private ConfigurableResource $configurableResource;
+
+    /**
      * @param ProductRepositoryInterface $productRepository
      * @param CategoryCollectionFactory $categoryCollectionFactory
      * @param StoreManagerInterface $storeManager
      * @param Config $config
+     * @param Configurable $configurableType
+     * @param ConfigurableResource $configurableResource
      */
     public function __construct(
         ProductRepositoryInterface $productRepository,
         CategoryCollectionFactory $categoryCollectionFactory,
         StoreManagerInterface $storeManager,
-        Config $config
+        Config $config,
+        Configurable $configurableType,
+        ConfigurableResource $configurableResource
     ) {
         $this->productRepository = $productRepository;
         $this->categoryCollectionFactory = $categoryCollectionFactory;
         $this->storeManager = $storeManager;
         $this->config = $config;
+        $this->configurableType = $configurableType;
+        $this->configurableResource = $configurableResource;
     }
 
     /**
@@ -101,6 +119,11 @@ class ProductBuilder
             'image_alt_texts' => $this->getImageAltTexts($product),
             'store_id' => $storeId,
         ];
+
+        // Include configurable options for configurable products
+        if ($product->getTypeId() === 'configurable') {
+            $data['configurable_options'] = $this->getConfigurableOptions($product);
+        }
 
         // Add URL if available
         if ($product instanceof Product) {
@@ -233,6 +256,94 @@ class ProductBuilder
         }
 
         return array_unique($altTexts);
+    }
+
+    /**
+     * Get configurable product options (colors, sizes, etc.)
+     *
+     * @param ProductInterface|Product $product
+     * @return array
+     */
+    private function getConfigurableOptions(ProductInterface $product): array
+    {
+        if (!$product instanceof Product || $product->getTypeId() !== 'configurable') {
+            return [];
+        }
+
+        $options = [];
+
+        try {
+            $configurableAttributes = $this->configurableType->getConfigurableAttributes($product);
+
+            foreach ($configurableAttributes as $attribute) {
+                $productAttribute = $attribute->getProductAttribute();
+                if (!$productAttribute) {
+                    continue;
+                }
+
+                $attributeCode = $productAttribute->getAttributeCode();
+                $label = $productAttribute->getStoreLabel() ?: $productAttribute->getFrontendLabel();
+
+                // Get all option values
+                $optionValues = [];
+                $attributeOptions = $productAttribute->getSource()->getAllOptions(false);
+
+                // Get used values from children
+                $usedOptions = $attribute->getOptions() ?: [];
+                $usedValueIds = array_column($usedOptions, 'value_index');
+
+                foreach ($attributeOptions as $option) {
+                    if (in_array($option['value'], $usedValueIds)) {
+                        $optionValues[] = $option['label'];
+                    }
+                }
+
+                if (!empty($optionValues)) {
+                    $options[] = [
+                        'attribute_code' => $attributeCode,
+                        'label' => $label,
+                        'values' => $optionValues,
+                    ];
+                }
+            }
+
+            // Get variant count
+            $childIds = $this->configurableResource->getChildrenIds($product->getId());
+            $variantCount = count($childIds[0] ?? []);
+
+            return [
+                'options' => $options,
+                'variant_count' => $variantCount,
+                'options_summary' => $this->buildOptionsSummary($options),
+            ];
+
+        } catch (\Exception $e) {
+            return [];
+        }
+    }
+
+    /**
+     * Build human-readable options summary
+     *
+     * @param array $options
+     * @return string
+     */
+    private function buildOptionsSummary(array $options): string
+    {
+        if (empty($options)) {
+            return '';
+        }
+
+        $parts = [];
+        foreach ($options as $option) {
+            $label = $option['label'] ?? 'Option';
+            $values = $option['values'] ?? [];
+            if (!empty($values)) {
+                $parts[] = "{$label}: " . implode(', ', $values);
+            }
+        }
+
+        return !empty($parts) ? "Available options: " . implode('; ', $parts) : '';
     }
 
     /**
