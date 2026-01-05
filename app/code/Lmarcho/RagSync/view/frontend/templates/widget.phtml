@@ -20,6 +20,7 @@ if (empty($scriptUrl)) {
 $configUrl = $viewModel->getConfigUrl();
 $apiBaseUrl = $viewModel->getApiBaseUrl();
 $customerContext = $viewModel->getCustomerContextJson();
+$chatSession = $viewModel->getChatSessionJson();
 ?>
 <script>
 (function() {
@@ -29,6 +30,7 @@ $customerContext = $viewModel->getCustomerContextJson();
     var configUrl = <?= /* @noEscape */ json_encode($configUrl) ?>;
     var apiBaseUrl = <?= /* @noEscape */ json_encode($apiBaseUrl) ?>;
     var customerContext = <?= /* @noEscape */ $customerContext ?>;
+    var chatSession = <?= /* @noEscape */ $chatSession ?>;
 
     // Load the widget script
     var script = document.createElement('script');
@@ -54,6 +56,7 @@ $customerContext = $viewModel->getCustomerContextJson();
                     ...config,
                     apiUrl: apiBaseUrl,
                     customer: customerContext,
+                    session: chatSession,
                     debug: false
                 });
             })
