@@ -17,37 +17,53 @@ if (empty($scriptUrl)) {
     return;
 }
 
-$configJson = $viewModel->getWidgetConfigJson();
+$configUrl = $viewModel->getConfigUrl();
+$apiBaseUrl = $viewModel->getApiBaseUrl();
+$customerContext = $viewModel->getCustomerContextJson();
 ?>
-<div id="rag-chat-widget" data-config="<?= $block->escapeHtmlAttr($configJson) ?>"></div>
 <script>
 (function() {
     'use strict';
 
-    var widgetContainer = document.getElementById('rag-chat-widget');
-    if (!widgetContainer) {
-        return;
-    }
-
-    var config = {};
-    try {
-        config = JSON.parse(widgetContainer.getAttribute('data-config') || '{}');
-    } catch (e) {
-        console.error('RAG Widget: Failed to parse config', e);
-        return;
-    }
-
-    // Set global config for the widget script to read
-    window.RAG_WIDGET_CONFIG = config;
+    var scriptUrl = <?= /* @noEscape */ json_encode($scriptUrl) ?>;
+    var configUrl = <?= /* @noEscape */ json_encode($configUrl) ?>;
+    var apiBaseUrl = <?= /* @noEscape */ json_encode($apiBaseUrl) ?>;
+    var customerContext = <?= /* @noEscape */ $customerContext ?>;
 
     // Load the widget script
     var script = document.createElement('script');
-    script.src = <?= /* @noEscape */ json_encode($scriptUrl) ?>;
+    script.src = scriptUrl + '?v=' + Date.now();
     script.async = true;
-    script.defer = true;
+    script.onload = function() {
+        if (typeof window.RAGWidget === 'undefined') {
+            console.error('RAG Widget: RAGWidget not found after script load');
+            return;
+        }
+
+        // Fetch config from Laravel backend
+        fetch(configUrl)
+            .then(function(response) {
+                if (!response.ok) {
+                    throw new Error('Config fetch failed: ' + response.status);
+                }
+                return response.json();
+            })
+            .then(function(config) {
+                // Initialize widget with config from backend + Magento context
+                window.RAGWidget.init({
+                    ...config,
+                    apiUrl: apiBaseUrl,
+                    customer: customerContext,
+                    debug: false
+                });
+            })
+            .catch(function(error) {
+                console.error('RAG Widget: Failed to initialize', error);
+            });
+    };
     script.onerror = function() {
         console.error('RAG Widget: Failed to load widget script');
     };
-    document.body.appendChild(script);
+    document.head.appendChild(script);
 })();
 </script>

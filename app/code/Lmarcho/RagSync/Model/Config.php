@@ -70,13 +70,14 @@ class Config
 
     // Chat Widget Settings
     private const XML_PATH_WIDGET_ENABLED = 'chat_widget/enabled';
+    private const XML_PATH_WIDGET_TENANT_SLUG = 'chat_widget/tenant_slug';
     private const XML_PATH_WIDGET_EXCLUDE_PAGES = 'chat_widget/exclude_pages';
     private const XML_PATH_WIDGET_CUSTOMER_CONTEXT = 'chat_widget/send_customer_context';
 
     // Widget URLs (derived from webhook URL)
-    private const WIDGET_SCRIPT_PATH = '/widget/loader.js';
+    private const WIDGET_SCRIPT_PATH = '/widget/widget.iife.js';
     private const WIDGET_CONFIG_PATH = '/widget/config';
-    private const WIDGET_API_PATH = '/api/chat';
+    private const WIDGET_API_PATH = '';
 
     /**
      * @var ScopeConfigInterface
@@ -634,6 +635,17 @@ class Config
     public function isWidgetEnabled(?int $storeId = null): bool
     {
         return $this->isEnabled($storeId) && $this->getFlag(self::XML_PATH_WIDGET_ENABLED, $storeId);
+    }
+
+    /**
+     * Get widget tenant slug
+     *
+     * @param int|null $storeId
+     * @return string
+     */
+    public function getWidgetTenantSlug(?int $storeId = null): string
+    {
+        return (string)$this->getValue(self::XML_PATH_WIDGET_TENANT_SLUG, $storeId);
     }
 
     /**

@@ -96,44 +96,73 @@ class WidgetConfig implements ArgumentInterface
     }
 
     /**
-     * Get widget configuration as JSON for data attribute
+     * Get widget config URL with tenant parameter
      *
      * @return string
      */
-    public function getWidgetConfigJson(): string
+    public function getConfigUrl(): string
     {
         $storeId = $this->getStoreId();
-        $configData = [
-            'apiUrl' => $this->config->getWidgetApiUrl($storeId),
-            'configUrl' => $this->config->getWidgetConfigUrl($storeId),
-            'storeId' => $storeId,
-            'storeCode' => $this->getStoreCode(),
-        ];
+        $configUrl = $this->config->getWidgetConfigUrl($storeId);
+        $tenantSlug = $this->config->getWidgetTenantSlug($storeId);
 
-        if ($this->config->isWidgetCustomerContextEnabled($storeId)) {
-            $configData['customer'] = $this->getCustomerContext();
+        if (!empty($tenantSlug)) {
+            $configUrl .= '?tenant=' . urlencode($tenantSlug);
         }
 
-        return json_encode($configData, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
+        return $configUrl;
     }
 
     /**
-     * Get customer context data
+     * Get API base URL (scheme://host:port)
      *
-     * @return array
+     * @return string
      */
-    private function getCustomerContext(): array
+    public function getApiBaseUrl(): string
     {
+        $webhookUrl = $this->config->getWebhookUrl($this->getStoreId());
+        if (empty($webhookUrl)) {
+            return '';
+        }
+
+        $parsed = parse_url($webhookUrl);
+        if (!isset($parsed['scheme'], $parsed['host'])) {
+            return '';
+        }
+
+        $baseUrl = $parsed['scheme'] . '://' . $parsed['host'];
+        if (isset($parsed['port'])) {
+            $baseUrl .= ':' . $parsed['port'];
+        }
+
+        return $baseUrl;
+    }
+
+    /**
+     * Get customer context as JSON string
+     *
+     * @return string
+     */
+    public function getCustomerContextJson(): string
+    {
+        $storeId = $this->getStoreId();
+
+        if (!$this->config->isWidgetCustomerContextEnabled($storeId)) {
+            return 'null';
+        }
+
         $context = [
             'isLoggedIn' => $this->customerSession->isLoggedIn(),
             'groupId' => null,
+            'storeId' => $storeId,
+            'storeCode' => $this->getStoreCode(),
         ];
 
         if ($this->customerSession->isLoggedIn()) {
             $context['groupId'] = (int)$this->customerSession->getCustomerGroupId();
         }
 
-        return $context;
+        return json_encode($context, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
     }
 
     /**

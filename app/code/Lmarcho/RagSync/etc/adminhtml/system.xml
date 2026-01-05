@@ -343,6 +343,15 @@
                     <comment>Display the RAG-powered chat widget on the storefront.</comment>
                 </field>
 
+                <field id="tenant_slug" translate="label comment" type="text" sortOrder="15"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Tenant Slug</label>
+                    <comment>Your tenant identifier for the widget config (e.g., demo-magento).</comment>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+
                 <field id="exclude_pages" translate="label comment" type="textarea" sortOrder="20"
                        showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Exclude Page Handles</label>

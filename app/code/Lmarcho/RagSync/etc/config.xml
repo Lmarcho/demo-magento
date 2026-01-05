@@ -82,6 +82,7 @@
             <!-- Chat Widget Settings -->
             <chat_widget>
                 <enabled>0</enabled>
+                <tenant_slug></tenant_slug>
                 <exclude_pages>checkout_index_index,checkout_cart_index</exclude_pages>
                 <send_customer_context>1</send_customer_context>
             </chat_widget>
