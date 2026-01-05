@@ -174,6 +174,16 @@ class WidgetConfig implements ArgumentInterface
     }
 
     /**
+     * Get widget API key for authentication
+     *
+     * @return string
+     */
+    public function getApiKey(): string
+    {
+        return $this->config->getWidgetApiKey($this->getStoreId());
+    }
+
+    /**
      * Get customer context as JSON string
      *
      * @return string

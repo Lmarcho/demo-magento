@@ -71,6 +71,7 @@ class Config
     // Chat Widget Settings
     private const XML_PATH_WIDGET_ENABLED = 'chat_widget/enabled';
     private const XML_PATH_WIDGET_TENANT_SLUG = 'chat_widget/tenant_slug';
+    private const XML_PATH_WIDGET_API_KEY = 'chat_widget/api_key';
     private const XML_PATH_WIDGET_EXCLUDE_PAGES = 'chat_widget/exclude_pages';
     private const XML_PATH_WIDGET_CUSTOMER_CONTEXT = 'chat_widget/send_customer_context';
 
@@ -646,6 +647,17 @@ class Config
     public function getWidgetTenantSlug(?int $storeId = null): string
     {
         return (string)$this->getValue(self::XML_PATH_WIDGET_TENANT_SLUG, $storeId);
+    }
+
+    /**
+     * Get widget API key for authentication
+     *
+     * @param int|null $storeId
+     * @return string
+     */
+    public function getWidgetApiKey(?int $storeId = null): string
+    {
+        return (string)$this->getValue(self::XML_PATH_WIDGET_API_KEY, $storeId);
     }
 
     /**

@@ -352,6 +352,16 @@
                     </depends>
                 </field>
 
+                <field id="api_key" translate="label comment" type="obscure" sortOrder="16"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Widget API Key</label>
+                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                    <comment>API key for widget authentication (rag_xxx format from Laravel backend).</comment>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+
                 <field id="exclude_pages" translate="label comment" type="textarea" sortOrder="20"
                        showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Exclude Page Handles</label>

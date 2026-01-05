@@ -19,6 +19,7 @@ if (empty($scriptUrl)) {
 
 $configUrl = $viewModel->getConfigUrl();
 $apiBaseUrl = $viewModel->getApiBaseUrl();
+$apiKey = $viewModel->getApiKey();
 $customerContext = $viewModel->getCustomerContextJson();
 $chatSession = $viewModel->getChatSessionJson();
 ?>
@@ -29,6 +30,7 @@ $chatSession = $viewModel->getChatSessionJson();
     var scriptUrl = <?= /* @noEscape */ json_encode($scriptUrl) ?>;
     var configUrl = <?= /* @noEscape */ json_encode($configUrl) ?>;
     var apiBaseUrl = <?= /* @noEscape */ json_encode($apiBaseUrl) ?>;
+    var apiKey = <?= /* @noEscape */ json_encode($apiKey) ?>;
     var customerContext = <?= /* @noEscape */ $customerContext ?>;
     var chatSession = <?= /* @noEscape */ $chatSession ?>;
 
@@ -55,6 +57,7 @@ $chatSession = $viewModel->getChatSessionJson();
                 window.RAGWidget.init({
                     ...config,
                     apiUrl: apiBaseUrl,
+                    apiKey: apiKey,
                     customer: customerContext,
                     session: chatSession,
                     debug: false
