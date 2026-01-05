@@ -652,12 +652,18 @@ class Config
     /**
      * Get widget API key for authentication
      *
+     * Note: Value is encrypted in database, requires decryption
+     *
      * @param int|null $storeId
      * @return string
      */
     public function getWidgetApiKey(?int $storeId = null): string
     {
-        return (string)$this->getValue(self::XML_PATH_WIDGET_API_KEY, $storeId);
+        $value = (string)$this->getValue(self::XML_PATH_WIDGET_API_KEY, $storeId);
+        if (!empty($value)) {
+            return $this->encryptor->decrypt($value);
+        }
+        return '';
     }
 
     /**
