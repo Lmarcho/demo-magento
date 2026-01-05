@@ -16,6 +16,7 @@ use Lmarcho\RagSync\Model\DataBuilder\CmsPageBuilder;
 use Lmarcho\RagSync\Model\DataBuilder\CmsBlockBuilder;
 use Lmarcho\RagSync\Model\DataBuilder\CategoryBuilder;
 use Lmarcho\RagSync\Model\DataBuilder\PromotionBuilder;
+use Lmarcho\RagSync\Model\DataBuilder\StoreConfigBuilder;
 use Psr\Log\LoggerInterface;
 
 class ProcessQueue
@@ -61,6 +62,11 @@ class ProcessQueue
     private PromotionBuilder $promotionBuilder;
 
     /**
+     * @var StoreConfigBuilder
+     */
+    private StoreConfigBuilder $storeConfigBuilder;
+
+    /**
      * @var LoggerInterface
      */
     private LoggerInterface $logger;
@@ -74,6 +80,7 @@ class ProcessQueue
      * @param CmsBlockBuilder $cmsBlockBuilder
      * @param CategoryBuilder $categoryBuilder
      * @param PromotionBuilder $promotionBuilder
+     * @param StoreConfigBuilder $storeConfigBuilder
      * @param LoggerInterface $logger
      */
     public function __construct(
@@ -85,6 +92,7 @@ class ProcessQueue
         CmsBlockBuilder $cmsBlockBuilder,
         CategoryBuilder $categoryBuilder,
         PromotionBuilder $promotionBuilder,
+        StoreConfigBuilder $storeConfigBuilder,
         LoggerInterface $logger
     ) {
         $this->config = $config;
@@ -95,6 +103,7 @@ class ProcessQueue
         $this->cmsBlockBuilder = $cmsBlockBuilder;
         $this->categoryBuilder = $categoryBuilder;
         $this->promotionBuilder = $promotionBuilder;
+        $this->storeConfigBuilder = $storeConfigBuilder;
         $this->logger = $logger;
     }
 
@@ -244,6 +253,9 @@ class ProcessQueue
 
             case Queue::ENTITY_TYPE_CATALOG_RULE:
                 return $this->promotionBuilder->buildCatalogRule($entityId);
+
+            case Queue::ENTITY_TYPE_STORE_CONFIG:
+                return $this->storeConfigBuilder->build($storeId);
 
             default:
                 $this->logger->warning('RagSync: Unknown entity type', [

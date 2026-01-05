@@ -11,10 +11,12 @@ use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\Controller\Result\Json;
+use Magento\Store\Model\StoreManagerInterface;
 use Lmarcho\RagSync\Cron\FullProductSync;
 use Lmarcho\RagSync\Cron\FullCmsSync;
 use Lmarcho\RagSync\Cron\FullCategorySync;
 use Lmarcho\RagSync\Cron\PromotionSync;
+use Lmarcho\RagSync\Model\QueueService;
 use Psr\Log\LoggerInterface;
 
 class Entity extends Action
@@ -47,6 +49,16 @@ class Entity extends Action
     private PromotionSync $promotionSync;
 
     /**
+     * @var QueueService
+     */
+    private QueueService $queueService;
+
+    /**
+     * @var StoreManagerInterface
+     */
+    private StoreManagerInterface $storeManager;
+
+    /**
      * @var LoggerInterface
      */
     private LoggerInterface $logger;
@@ -58,6 +70,8 @@ class Entity extends Action
      * @param FullCmsSync $cmsSync
      * @param FullCategorySync $categorySync
      * @param PromotionSync $promotionSync
+     * @param QueueService $queueService
+     * @param StoreManagerInterface $storeManager
      * @param LoggerInterface $logger
      */
     public function __construct(
@@ -67,6 +81,8 @@ class Entity extends Action
         FullCmsSync $cmsSync,
         FullCategorySync $categorySync,
         PromotionSync $promotionSync,
+        QueueService $queueService,
+        StoreManagerInterface $storeManager,
         LoggerInterface $logger
     ) {
         parent::__construct($context);
@@ -75,6 +91,8 @@ class Entity extends Action
         $this->cmsSync = $cmsSync;
         $this->categorySync = $categorySync;
         $this->promotionSync = $promotionSync;
+        $this->queueService = $queueService;
+        $this->storeManager = $storeManager;
         $this->logger = $logger;
     }
 
@@ -111,6 +129,11 @@ class Entity extends Action
                     $message = __('Promotions queued for sync successfully!');
                     break;
 
+                case 'store_config':
+                    $this->syncStoreConfig();
+                    $message = __('Store config queued for sync successfully!');
+                    break;
+
                 default:
                     return $result->setData([
                         'success' => false,
@@ -132,6 +155,18 @@ class Entity extends Action
                 'success' => false,
                 'message' => __('Sync failed: %1', $e->getMessage()),
             ]);
+        }
+    }
+
+    /**
+     * Queue store config for all stores
+     *
+     * @return void
+     */
+    private function syncStoreConfig(): void
+    {
+        foreach ($this->storeManager->getStores() as $store) {
+            $this->queueService->queueStoreConfig((int)$store->getId());
         }
     }
 }

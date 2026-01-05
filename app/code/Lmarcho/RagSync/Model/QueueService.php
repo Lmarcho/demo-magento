@@ -195,6 +195,22 @@ class QueueService
     }
 
     /**
+     * Queue store config for sync
+     *
+     * @param int $storeId
+     * @return int|null
+     */
+    public function queueStoreConfig(int $storeId): ?int
+    {
+        if (!$this->config->isEnabled($storeId)) {
+            return null;
+        }
+
+        // Use store_id as the entity_id for store config
+        return $this->addToQueue(Queue::ENTITY_TYPE_STORE_CONFIG, $storeId, $storeId, Queue::ACTION_SAVE);
+    }
+
+    /**
      * Get queue statistics
      *
      * @return array

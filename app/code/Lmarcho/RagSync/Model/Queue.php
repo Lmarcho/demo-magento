@@ -19,6 +19,7 @@ class Queue extends AbstractModel
     public const ENTITY_TYPE_CATEGORY = 'category';
     public const ENTITY_TYPE_PROMOTION = 'promotion';
     public const ENTITY_TYPE_CATALOG_RULE = 'catalog_rule';
+    public const ENTITY_TYPE_STORE_CONFIG = 'store_config';
 
     // Actions
     public const ACTION_SAVE = 'save';
@@ -33,6 +34,7 @@ class Queue extends AbstractModel
 
     // Priorities (1 = highest, 10 = lowest)
     public const PRIORITY_DELETE = 1;
+    public const PRIORITY_STORE_CONFIG = 1;
     public const PRIORITY_PRODUCT = 2;
     public const PRIORITY_CMS_PAGE = 3;
     public const PRIORITY_CATEGORY = 4;
@@ -337,6 +339,7 @@ class Queue extends AbstractModel
         }
 
         $priorities = [
+            self::ENTITY_TYPE_STORE_CONFIG => self::PRIORITY_STORE_CONFIG,
             self::ENTITY_TYPE_PRODUCT => self::PRIORITY_PRODUCT,
             self::ENTITY_TYPE_CMS_PAGE => self::PRIORITY_CMS_PAGE,
             self::ENTITY_TYPE_CATEGORY => self::PRIORITY_CATEGORY,

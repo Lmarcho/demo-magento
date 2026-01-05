@@ -51,4 +51,15 @@
     <event name="catalogrule_rule_save_after">
         <observer name="ragsync_catalog_rule_save" instance="Lmarcho\RagSync\Observer\CatalogRuleSaveObserver"/>
     </event>
+
+    <!-- Store Config Events -->
+    <event name="admin_system_config_changed_section_general">
+        <observer name="ragsync_store_config_general" instance="Lmarcho\RagSync\Observer\StoreConfigSaveObserver"/>
+    </event>
+    <event name="admin_system_config_changed_section_currency">
+        <observer name="ragsync_store_config_currency" instance="Lmarcho\RagSync\Observer\StoreConfigSaveObserver"/>
+    </event>
+    <event name="admin_system_config_changed_section_trans_email">
+        <observer name="ragsync_store_config_email" instance="Lmarcho\RagSync\Observer\StoreConfigSaveObserver"/>
+    </event>
 </config>

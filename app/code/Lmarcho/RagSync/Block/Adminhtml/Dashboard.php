@@ -14,6 +14,7 @@ use Magento\Cms\Model\ResourceModel\Page\CollectionFactory as PageCollectionFact
 use Magento\Cms\Model\ResourceModel\Block\CollectionFactory as BlockCollectionFactory;
 use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory as CategoryCollectionFactory;
 use Magento\SalesRule\Model\ResourceModel\Rule\CollectionFactory as CartRuleCollectionFactory;
+use Magento\Store\Model\StoreManagerInterface;
 use Lmarcho\RagSync\Model\Config;
 use Lmarcho\RagSync\Model\QueueService;
 use Lmarcho\RagSync\Model\CircuitBreaker;
@@ -72,6 +73,11 @@ class Dashboard extends Template
     private CartRuleCollectionFactory $cartRuleCollectionFactory;
 
     /**
+     * @var StoreManagerInterface
+     */
+    private StoreManagerInterface $storeManager;
+
+    /**
      * @param Context $context
      * @param Config $config
      * @param QueueService $queueService
@@ -82,6 +88,7 @@ class Dashboard extends Template
      * @param BlockCollectionFactory $blockCollectionFactory
      * @param CategoryCollectionFactory $categoryCollectionFactory
      * @param CartRuleCollectionFactory $cartRuleCollectionFactory
+     * @param StoreManagerInterface $storeManager
      * @param array $data
      */
     public function __construct(
@@ -95,6 +102,7 @@ class Dashboard extends Template
         BlockCollectionFactory $blockCollectionFactory,
         CategoryCollectionFactory $categoryCollectionFactory,
         CartRuleCollectionFactory $cartRuleCollectionFactory,
+        StoreManagerInterface $storeManager,
         array $data = []
     ) {
         parent::__construct($context, $data);
@@ -107,6 +115,7 @@ class Dashboard extends Template
         $this->blockCollectionFactory = $blockCollectionFactory;
         $this->categoryCollectionFactory = $categoryCollectionFactory;
         $this->cartRuleCollectionFactory = $cartRuleCollectionFactory;
+        $this->storeManager = $storeManager;
     }
 
     /**
@@ -237,6 +246,11 @@ class Dashboard extends Template
                 'count' => $this->getPromotionCount(),
                 'label' => __('Promotions'),
             ],
+            'store_config' => [
+                'enabled' => $this->config->isEnabled(),
+                'count' => $this->getStoreCount(),
+                'label' => __('Store Config'),
+            ],
         ];
     }
 
@@ -297,6 +311,16 @@ class Dashboard extends Template
         $collection = $this->cartRuleCollectionFactory->create();
         $collection->addFieldToFilter('is_active', 1);
         return $collection->getSize();
+    }
+
+    /**
+     * Get store count
+     *
+     * @return int
+     */
+    private function getStoreCount(): int
+    {
+        return count($this->storeManager->getStores());
     }
 
     /**
