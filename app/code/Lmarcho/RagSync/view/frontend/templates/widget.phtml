@@ -45,7 +45,9 @@ $chatSession = $viewModel->getChatSessionJson();
         }
 
         // Fetch config from Laravel backend
-        fetch(configUrl)
+        fetch(configUrl, {
+            headers: apiKey ? { 'X-Api-Key': apiKey } : {}
+        })
             .then(function(response) {
                 if (!response.ok) {
                     throw new Error('Config fetch failed: ' + response.status);
@@ -60,6 +62,7 @@ $chatSession = $viewModel->getChatSessionJson();
                     apiKey: apiKey,
                     customer: customerContext,
                     session: chatSession,
+                    skipRemoteConfig: true, // Config already fetched above
                     debug: false
                 });
             })
