@@ -9,7 +9,7 @@ Use this checklist for manual testing before deployment.
 - [ ] Module installs without errors via `bin/magento setup:upgrade`
 - [ ] Module compiles without errors via `bin/magento setup:di:compile`
 - [ ] No errors in `var/log/system.log` after installation
-- [ ] Database tables created: `rag_sync_queue`, `rag_sync_circuit_breaker`, `rag_sync_log`
+- [ ] Database tables created: `rag_sync_queue`, `rag_sync_circuit_breaker`
 
 ### Configuration
 

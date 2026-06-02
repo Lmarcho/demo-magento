@@ -1,0 +1,62 @@
+END USER LICENSE AGREEMENT (EULA)
+Lmarcho RagSync for Magento 2
+
+Copyright (c) Lmarcho / AskRAG. All rights reserved.
+
+This End User License Agreement ("Agreement") is a legal agreement between you
+(either an individual or a single legal entity, "Licensee") and Lmarcho / AskRAG
+("Licensor") for the Lmarcho RagSync extension, including all of its files,
+source code, and accompanying documentation (the "Software").
+
+By installing, copying, or otherwise using the Software, you agree to be bound by
+the terms of this Agreement. If you do not agree to these terms, do not install
+or use the Software.
+
+1. LICENSE GRANT
+   Subject to the terms of this Agreement and payment of any applicable fees,
+   Licensor grants Licensee a non-exclusive, non-transferable license to install
+   and use the Software on Magento 2 store instances owned or operated by
+   Licensee, in accordance with the purchase or subscription terms under which
+   the Software was obtained.
+
+2. RESTRICTIONS
+   Licensee shall not, and shall not permit any third party to:
+   (a) resell, sublicense, rent, lease, or redistribute the Software;
+   (b) remove, alter, or obscure any copyright, trademark, or other proprietary
+       notices contained in the Software;
+   (c) publish or otherwise make the Software available to the public as a
+       standalone product.
+   Modification of the Software for Licensee's own internal use is permitted, but
+   Licensor is under no obligation to support modified versions.
+
+3. OWNERSHIP
+   The Software is licensed, not sold. Licensor retains all right, title, and
+   interest in and to the Software, including all intellectual property rights.
+
+4. THIRD-PARTY / EXTERNAL SERVICE
+   The Software transmits store content and chat data to a backend service
+   ("AskRAG backend") configured by Licensee. Licensee is responsible for that
+   service's configuration and for complying with applicable privacy and data
+   protection laws. See README for the External Services disclosure.
+
+5. DISCLAIMER OF WARRANTY
+   THE SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+   FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT.
+
+6. LIMITATION OF LIABILITY
+   IN NO EVENT SHALL LICENSOR BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL,
+   OR CONSEQUENTIAL DAMAGES, OR ANY LOSS OF PROFITS OR DATA, ARISING OUT OF THE
+   USE OR INABILITY TO USE THE SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+   SUCH DAMAGES.
+
+7. TERM AND TERMINATION
+   This Agreement is effective until terminated. It terminates automatically if
+   Licensee breaches any of its terms. Upon termination, Licensee must cease use
+   of and remove all copies of the Software.
+
+8. GOVERNING LAW
+   This Agreement shall be governed by the laws of the jurisdiction in which
+   Licensor is established, without regard to its conflict-of-laws provisions.
+
+For licensing inquiries, contact: dev@lmarcho.com

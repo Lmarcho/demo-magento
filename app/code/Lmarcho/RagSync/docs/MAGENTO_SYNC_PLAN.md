@@ -106,7 +106,6 @@ php artisan magento:status             # Show sync status for all entities
 **Database Tables (via db_schema.xml):**
 - `rag_sync_queue` - Main queue table with deduplication
 - `rag_sync_circuit_breaker` - Circuit breaker state storage
-- `rag_sync_log` - Sync audit trail
 
 **Key Features:**
 - Queue-based async sync (never blocks admin saves)

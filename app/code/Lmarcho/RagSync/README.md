@@ -15,9 +15,32 @@ A robust Magento 2 module that synchronizes catalog and CMS content to a RAG (Re
 
 ## Requirements
 
-- Magento 2.4.0 or higher
-- PHP 8.1 or higher
-- A RAG backend with compatible webhook endpoints
+- Magento Open Source / Adobe Commerce 2.4.x
+- PHP 8.1, 8.2, or 8.3
+- An AskRAG backend with compatible webhook endpoints (the module is a connector and does not function without it)
+
+## External Services & Privacy
+
+This module is a connector to an external service — the **AskRAG backend** whose URL you
+configure under Stores → Configuration → RAG Sync → Connection. It does not function without it.
+
+What data is sent, and when:
+
+- **On content sync** (queued on save/delete, or via full sync/CLI): product, CMS page,
+  CMS block, category, and promotion data — including names, descriptions, prices, SKUs,
+  and URLs — is sent to the configured Webhook URL. Requests are signed with an
+  HMAC-SHA256 signature derived from your API Secret.
+- **On the storefront chat widget** (if enabled): the visitor's browser loads the widget
+  script from the backend and sends chat messages plus minimal session/customer context
+  (a generated session ID, and for logged-in customers their customer/group ID) to that
+  backend to generate answers.
+
+No data is transmitted to any party other than the backend URL you configure. You are
+responsible for that backend's data handling and for complying with applicable privacy laws.
+
+- Service provider (default): https://askrag.app
+- Terms of Service: https://askrag.app/terms
+- Privacy Policy: https://askrag.app/privacy
 
 ## Installation
 
@@ -272,7 +295,6 @@ Enable debug mode for verbose logging:
 |-------|---------|
 | `rag_sync_queue` | Sync queue with deduplication |
 | `rag_sync_circuit_breaker` | Circuit breaker state |
-| `rag_sync_log` | Audit trail |
 
 ## Troubleshooting
 
@@ -331,7 +353,6 @@ To remove database tables:
 ```sql
 DROP TABLE IF EXISTS rag_sync_queue;
 DROP TABLE IF EXISTS rag_sync_circuit_breaker;
-DROP TABLE IF EXISTS rag_sync_log;
 ```
 
 ## Support
@@ -341,7 +362,8 @@ DROP TABLE IF EXISTS rag_sync_log;
 
 ## License
 
-Proprietary - All rights reserved.
+Proprietary. Use of this module is governed by the End User License Agreement in
+[LICENSE.txt](LICENSE.txt). All rights reserved.
 
 ## Version History
 
