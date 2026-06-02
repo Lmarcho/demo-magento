@@ -202,17 +202,22 @@ class Config
     }
 
     /**
-     * Get API secret
+     * Get API secret (HMAC signing key)
      *
-     * Note: Value is automatically decrypted by Magento when using
-     * backend_model="Magento\Config\Model\Config\Backend\Encrypted" in system.xml
+     * Stored encrypted (system.xml uses backend_model Encrypted). The Encrypted
+     * backend only encrypts on save; reads via scope config return the ciphertext,
+     * so it must be decrypted here before use as the HMAC key.
      *
      * @param int|null $storeId
      * @return string
      */
     public function getApiSecret(?int $storeId = null): string
     {
-        return (string)$this->getValue(self::XML_PATH_API_SECRET, $storeId);
+        $value = (string)$this->getValue(self::XML_PATH_API_SECRET, $storeId);
+        if (!empty($value)) {
+            return $this->encryptor->decrypt($value);
+        }
+        return '';
     }
 
     /**

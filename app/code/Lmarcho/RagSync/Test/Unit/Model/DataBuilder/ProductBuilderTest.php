@@ -14,6 +14,8 @@ use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory as CategoryCollectionFactory;
 use Magento\Catalog\Model\ResourceModel\Category\Collection as CategoryCollection;
+use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
+use Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable as ConfigurableResource;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\Exception\NoSuchEntityException;
 use PHPUnit\Framework\TestCase;
@@ -46,12 +48,24 @@ class ProductBuilderTest extends TestCase
      */
     private $configMock;
 
+    /**
+     * @var Configurable|MockObject
+     */
+    private $configurableTypeMock;
+
+    /**
+     * @var ConfigurableResource|MockObject
+     */
+    private $configurableResourceMock;
+
     protected function setUp(): void
     {
         $this->productRepositoryMock = $this->createMock(ProductRepositoryInterface::class);
         $this->categoryCollectionFactoryMock = $this->createMock(CategoryCollectionFactory::class);
         $this->storeManagerMock = $this->createMock(StoreManagerInterface::class);
         $this->configMock = $this->createMock(Config::class);
+        $this->configurableTypeMock = $this->createMock(Configurable::class);
+        $this->configurableResourceMock = $this->createMock(ConfigurableResource::class);
 
         // Default config mocks
         $this->configMock->method('getExcludedCategoryIds')->willReturn([]);
@@ -64,7 +78,9 @@ class ProductBuilderTest extends TestCase
             $this->productRepositoryMock,
             $this->categoryCollectionFactoryMock,
             $this->storeManagerMock,
-            $this->configMock
+            $this->configMock,
+            $this->configurableTypeMock,
+            $this->configurableResourceMock
         );
     }
 
@@ -163,7 +179,9 @@ class ProductBuilderTest extends TestCase
             $this->productRepositoryMock,
             $this->categoryCollectionFactoryMock,
             $this->storeManagerMock,
-            $this->configMock
+            $this->configMock,
+            $this->configurableTypeMock,
+            $this->configurableResourceMock
         );
 
         $productMock = $this->createProductMock();
