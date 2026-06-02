@@ -45,7 +45,7 @@
             }
 
             $.ajax({
-                url: '<?= $block->escapeUrl($block->getAjaxUrl()) ?>',
+                url: '<?= $escaper->escapeUrl($block->getAjaxUrl()) ?>',
                 type: 'POST',
                 dataType: 'json',
                 data: requestData,

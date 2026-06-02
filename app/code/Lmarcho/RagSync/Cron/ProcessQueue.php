@@ -133,27 +133,34 @@ class ProcessQueue
         $retryDelays = $this->config->getRetryDelays();
         $retryItems = $this->queueResource->getItemsForRetry($retryDelays, $batchSize - count($pendingItems));
 
-        $items = array_merge($pendingItems, $retryItems);
+        $candidates = array_merge($pendingItems, $retryItems);
 
+        if (empty($candidates)) {
+            return;
+        }
+
+        // Atomically claim the candidates so a concurrent run (cron + admin button
+        // + CLI all call this execute()) cannot pick up and send the same items.
+        $token = bin2hex(random_bytes(16));
+        if ($this->queueResource->claimItems(array_column($candidates, 'id'), $token) === 0) {
+            return;
+        }
+        $items = $this->queueResource->getClaimedItems($token);
         if (empty($items)) {
             return;
         }
 
-        // Mark items as processing
-        $ids = array_column($items, 'id');
-        $this->queueResource->markAsProcessing($ids);
-
         // Build batch payload
         $batchItems = [];
-        $processedIds = [];
-        $failedIds = [];
+        $batchIds = [];
+        $skippedIds = [];
 
         foreach ($items as $item) {
             $data = $this->buildEntityData($item);
 
             if ($data === null) {
-                // Entity not found or should not be synced - mark as sent
-                $processedIds[] = $item['id'];
+                // Entity not found or should not be synced - nothing to send.
+                $skippedIds[] = $item['id'];
                 continue;
             }
 
@@ -164,13 +171,15 @@ class ProcessQueue
                 'store_id' => (int)$item['store_id'],
                 'data' => $data,
             ];
+            $batchIds[] = $item['id'];
+        }
+
+        // Skipped items are not failures; resolve them independently of the batch.
+        if (!empty($skippedIds)) {
+            $this->queueResource->markAsSent($skippedIds);
         }
 
         if (empty($batchItems)) {
-            // All items were skipped
-            if (!empty($processedIds)) {
-                $this->queueResource->markAsSent($processedIds);
-            }
             return;
         }
 
@@ -178,9 +187,7 @@ class ProcessQueue
         $response = $this->webhookSender->sendBatch($batchItems);
 
         if ($response->isSuccess()) {
-            // Mark all as sent
-            $allIds = array_column($items, 'id');
-            $this->queueResource->markAsSent($allIds);
+            $this->queueResource->markAsSent($batchIds);
 
             $this->logger->info('RagSync: Batch processed successfully', [
                 'count' => count($batchItems),
@@ -191,9 +198,8 @@ class ProcessQueue
             $errorMessage = $response->getErrorMessage();
 
             if ($response->isPermanentError()) {
-                // Permanent error - mark all as dead
-                $allIds = array_column($items, 'id');
-                $this->queueResource->markAsFailed($allIds, $errorMessage, 0); // 0 = mark as dead immediately
+                // Permanent error - mark as dead immediately (0 retries)
+                $this->queueResource->markAsFailed($batchIds, $errorMessage, 0);
 
                 $this->logger->error('RagSync: Batch failed with permanent error', [
                     'error' => $errorMessage,
@@ -201,8 +207,7 @@ class ProcessQueue
                 ]);
             } else {
                 // Transient error - mark for retry
-                $allIds = array_column($items, 'id');
-                $this->queueResource->markAsFailed($allIds, $errorMessage, $maxRetries);
+                $this->queueResource->markAsFailed($batchIds, $errorMessage, $maxRetries);
 
                 $this->logger->warning('RagSync: Batch failed, will retry', [
                     'error' => $errorMessage,

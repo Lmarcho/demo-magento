@@ -742,6 +742,7 @@ class Config
             return '';
         }
 
+        // phpcs:ignore Magento2.Functions.DiscouragedFunction -- parse_url is the simplest reliable split of scheme/host/port
         $parsed = parse_url($webhookUrl);
         if (!isset($parsed['scheme'], $parsed['host'])) {
             return '';

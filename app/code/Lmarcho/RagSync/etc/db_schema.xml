@@ -30,6 +30,9 @@
         <column xsi:type="datetime" name="last_attempt_at" nullable="true" comment="Last attempt timestamp"/>
         <column xsi:type="text" name="error_message" nullable="true" comment="Last error message"/>
 
+        <!-- Worker claim token for atomic, concurrency-safe batch processing -->
+        <column xsi:type="varchar" name="processor_token" nullable="true" length="64" comment="Worker claim token"/>
+
         <!-- Timestamps -->
         <column xsi:type="datetime" name="created_at" nullable="false" on_update="false" default="CURRENT_TIMESTAMP" comment="Created At"/>
         <column xsi:type="datetime" name="updated_at" nullable="false" on_update="true" default="CURRENT_TIMESTAMP" comment="Updated At"/>
@@ -62,6 +65,10 @@
         <index referenceId="RAG_SYNC_QUEUE_ENTITY_TYPE" indexType="btree">
             <column name="entity_type"/>
         </index>
+
+        <index referenceId="RAG_SYNC_QUEUE_PROCESSOR_TOKEN" indexType="btree">
+            <column name="processor_token"/>
+        </index>
     </table>
 
     <!-- Circuit Breaker State Table -->
@@ -81,36 +88,5 @@
         <constraint xsi:type="unique" referenceId="RAG_SYNC_CIRCUIT_BREAKER_SERVICE_NAME">
             <column name="service_name"/>
         </constraint>
-    </table>
-
-    <!-- Sync Log Table for Audit Trail -->
-    <table name="rag_sync_log" resource="default" engine="innodb" comment="RAG Sync Activity Log">
-        <column xsi:type="int" name="id" unsigned="true" nullable="false" identity="true" comment="Log ID"/>
-        <column xsi:type="varchar" name="entity_type" nullable="false" length="50" comment="Entity Type"/>
-        <column xsi:type="varchar" name="entity_id" nullable="false" length="50" comment="Entity ID"/>
-        <column xsi:type="int" name="store_id" unsigned="true" nullable="false" default="0" comment="Store ID"/>
-        <column xsi:type="varchar" name="action" nullable="false" length="20" comment="Action"/>
-        <column xsi:type="varchar" name="status" nullable="false" length="20" comment="Status"/>
-        <column xsi:type="int" name="http_code" unsigned="true" nullable="true" comment="HTTP Response Code"/>
-        <column xsi:type="int" name="duration_ms" unsigned="true" nullable="true" comment="Request Duration in Milliseconds"/>
-        <column xsi:type="text" name="error_message" nullable="true" comment="Error Message"/>
-        <column xsi:type="datetime" name="created_at" nullable="false" on_update="false" default="CURRENT_TIMESTAMP" comment="Created At"/>
-
-        <constraint xsi:type="primary" referenceId="PRIMARY">
-            <column name="id"/>
-        </constraint>
-
-        <index referenceId="RAG_SYNC_LOG_ENTITY_TYPE_ENTITY_ID" indexType="btree">
-            <column name="entity_type"/>
-            <column name="entity_id"/>
-        </index>
-
-        <index referenceId="RAG_SYNC_LOG_CREATED_AT" indexType="btree">
-            <column name="created_at"/>
-        </index>
-
-        <index referenceId="RAG_SYNC_LOG_STATUS" indexType="btree">
-            <column name="status"/>
-        </index>
     </table>
 </schema>

@@ -183,12 +183,20 @@ class Queue extends AbstractDb
     }
 
     /**
-     * Mark items as processing (lock them)
+     * Atomically claim items for processing.
+     *
+     * Only items still in a claimable state (pending or failed) are flipped to
+     * processing and stamped with the worker token. Because the WHERE clause
+     * guards on status, two concurrent workers cannot both claim the same row:
+     * the second update matches zero rows for an already-claimed item. Use
+     * {@see getClaimedItems()} with the same token to fetch exactly what this
+     * worker owns.
      *
      * @param array $ids
-     * @return int Number of affected rows
+     * @param string $token
+     * @return int Number of items claimed by this worker
      */
-    public function markAsProcessing(array $ids): int
+    public function claimItems(array $ids, string $token): int
     {
         if (empty($ids)) {
             return 0;
@@ -196,17 +204,42 @@ class Queue extends AbstractDb
 
         $connection = $this->getConnection();
         $table = $this->getMainTable();
+        $now = $this->dateTime->gmtDate();
 
         return $connection->update(
             $table,
             [
                 'status' => QueueModel::STATUS_PROCESSING,
-                'last_attempt_at' => $this->dateTime->gmtDate(),
+                'processor_token' => $token,
+                'last_attempt_at' => $now,
                 'attempts' => new \Zend_Db_Expr('attempts + 1'),
-                'updated_at' => $this->dateTime->gmtDate(),
+                'updated_at' => $now,
             ],
-            ['id IN (?)' => $ids]
+            [
+                'id IN (?)' => $ids,
+                'status IN (?)' => [QueueModel::STATUS_PENDING, QueueModel::STATUS_FAILED],
+            ]
         );
+    }
+
+    /**
+     * Get items claimed by a worker token
+     *
+     * @param string $token
+     * @return array
+     */
+    public function getClaimedItems(string $token): array
+    {
+        $connection = $this->getConnection();
+        $table = $this->getMainTable();
+
+        $select = $connection->select()
+            ->from($table)
+            ->where('processor_token = ?', $token)
+            ->where('status = ?', QueueModel::STATUS_PROCESSING)
+            ->order(['priority ASC', 'created_at ASC']);
+
+        return $connection->fetchAll($select);
     }
 
     /**
@@ -229,6 +262,7 @@ class Queue extends AbstractDb
             [
                 'status' => QueueModel::STATUS_SENT,
                 'error_message' => null,
+                'processor_token' => null,
                 'updated_at' => $this->dateTime->gmtDate(),
             ],
             ['id IN (?)' => $ids]
@@ -277,6 +311,7 @@ class Queue extends AbstractDb
                 [
                     'status' => QueueModel::STATUS_FAILED,
                     'error_message' => $errorMessage,
+                    'processor_token' => null,
                     'updated_at' => $this->dateTime->gmtDate(),
                 ],
                 ['id IN (?)' => $failedIds]
@@ -289,6 +324,7 @@ class Queue extends AbstractDb
                 [
                     'status' => QueueModel::STATUS_DEAD,
                     'error_message' => $errorMessage,
+                    'processor_token' => null,
                     'updated_at' => $this->dateTime->gmtDate(),
                 ],
                 ['id IN (?)' => $deadIds]
@@ -394,6 +430,7 @@ class Queue extends AbstractDb
             $table,
             [
                 'status' => QueueModel::STATUS_PENDING,
+                'processor_token' => null,
                 'updated_at' => $this->dateTime->gmtDate(),
             ],
             [

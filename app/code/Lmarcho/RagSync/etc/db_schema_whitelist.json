@@ -1,0 +1,44 @@
+{
+    "rag_sync_queue": {
+        "column": {
+            "id": true,
+            "entity_type": true,
+            "entity_id": true,
+            "store_id": true,
+            "action": true,
+            "priority": true,
+            "status": true,
+            "attempts": true,
+            "last_attempt_at": true,
+            "error_message": true,
+            "processor_token": true,
+            "created_at": true,
+            "updated_at": true
+        },
+        "index": {
+            "RAG_SYNC_QUEUE_STATUS_PRIORITY_CREATED_AT": true,
+            "RAG_SYNC_QUEUE_STATUS_UPDATED_AT": true,
+            "RAG_SYNC_QUEUE_ENTITY_TYPE": true,
+            "RAG_SYNC_QUEUE_PROCESSOR_TOKEN": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "RAG_SYNC_QUEUE_ENTITY_TYPE_ENTITY_ID_STORE_ID_ACTION": true
+        }
+    },
+    "rag_sync_circuit_breaker": {
+        "column": {
+            "id": true,
+            "service_name": true,
+            "state": true,
+            "failure_count": true,
+            "last_failure_at": true,
+            "opened_at": true,
+            "updated_at": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "RAG_SYNC_CIRCUIT_BREAKER_SERVICE_NAME": true
+        }
+    }
+}

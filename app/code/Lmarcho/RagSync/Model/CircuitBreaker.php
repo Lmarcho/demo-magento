@@ -253,7 +253,18 @@ class CircuitBreaker
             'updated_at' => $now,
         ];
 
-        $connection->insert($table, $data);
+        try {
+            $connection->insert($table, $data);
+        } catch (\Exception $e) {
+            // Another process inserted the row concurrently (service_name is unique).
+            // Fall back to the existing row instead of failing.
+            $existing = $connection->fetchRow(
+                $connection->select()->from($table)->where('service_name = ?', self::SERVICE_NAME)
+            );
+            if ($existing) {
+                return $existing;
+            }
+        }
 
         return $data;
     }

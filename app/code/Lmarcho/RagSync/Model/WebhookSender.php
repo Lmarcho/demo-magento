@@ -229,8 +229,21 @@ class WebhookSender
             $statusCode = $response->getStatusCode();
             $success = $statusCode >= 200 && $statusCode < 300;
 
+            $webhookResponse = new WebhookResponse(
+                $success,
+                $statusCode,
+                $this->parseResponseBody($response),
+                null,
+                $duration
+            );
+
+            // Guzzle is configured with http_errors=false, so non-2xx responses do
+            // not throw. Feed retryable server-side failures (5xx, 429) into the
+            // circuit breaker; 4xx client errors are permanent and left untouched.
             if ($success) {
                 $this->circuitBreaker->recordSuccess();
+            } elseif ($webhookResponse->isRetryable()) {
+                $this->circuitBreaker->recordFailure();
             }
 
             if ($this->config->isDebugEnabled()) {
@@ -241,13 +254,7 @@ class WebhookSender
                 ]);
             }
 
-            return new WebhookResponse(
-                $success,
-                $statusCode,
-                $this->parseResponseBody($response),
-                null,
-                $duration
-            );
+            return $webhookResponse;
         } catch (GuzzleException $e) {
             $this->circuitBreaker->recordFailure();
             return $this->handleException($e);

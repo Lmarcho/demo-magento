@@ -185,6 +185,7 @@ class CmsPageBuilder
         $text = strip_tags($html);
 
         // Decode HTML entities
+        // phpcs:ignore Magento2.Functions.DiscouragedFunction -- decode HTML entities to clean plaintext for the RAG payload
         $text = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
 
         // Normalize whitespace
