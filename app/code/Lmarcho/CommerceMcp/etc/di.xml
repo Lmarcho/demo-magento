@@ -17,6 +17,10 @@
                 type="Lmarcho\CommerceMcp\Model\Product\RelatedProductService"/>
     <preference for="Lmarcho\CommerceMcp\Api\PromotionServiceInterface"
                 type="Lmarcho\CommerceMcp\Model\Promotion\PromotionService"/>
+    <preference for="Lmarcho\CommerceMcp\Api\CustomerAssertionServiceInterface"
+                type="Lmarcho\CommerceMcp\Model\Authentication\CustomerAssertionService"/>
+    <preference for="Lmarcho\CommerceMcp\Api\OrderStatusServiceInterface"
+                type="Lmarcho\CommerceMcp\Model\Order\OrderStatusService"/>
 
     <type name="Lmarcho\CommerceMcp\Model\Mcp\ToolRegistry">
         <arguments>
@@ -33,6 +37,8 @@
                       xsi:type="object">Lmarcho\CommerceMcp\Model\Tool\GetRelatedProducts</item>
                 <item name="get_active_promotions"
                       xsi:type="object">Lmarcho\CommerceMcp\Model\Tool\GetActivePromotions</item>
+                <item name="get_order_status"
+                      xsi:type="object">Lmarcho\CommerceMcp\Model\Tool\GetOrderStatus</item>
             </argument>
         </arguments>
     </type>

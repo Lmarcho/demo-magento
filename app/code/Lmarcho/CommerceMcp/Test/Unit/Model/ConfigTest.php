@@ -68,4 +68,14 @@ class ConfigTest extends TestCase
             (new Config($scopeConfig))->getPublicCouponCodes()
         );
     }
+
+    public function testCustomerAssertionLifetimeIsClamped(): void
+    {
+        $scopeConfig = $this->createMock(ScopeConfigInterface::class);
+        $scopeConfig->method('getValue')
+            ->with('commerce_mcp/general/customer_assertion_lifetime_seconds')
+            ->willReturn(999);
+
+        self::assertSame(300, (new Config($scopeConfig))->getCustomerAssertionLifetimeSeconds());
+    }
 }

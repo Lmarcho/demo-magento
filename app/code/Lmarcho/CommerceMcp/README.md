@@ -4,7 +4,7 @@ Magento-native, authenticated, read-only MCP server for live commerce data.
 
 ## Current status
 
-Phases M1 through M6 are implemented:
+Phases M1 through M7 are implemented:
 
 - `POST /commerce-mcp`
 - JSON-RPC 2.0
@@ -40,9 +40,13 @@ Phases M1 through M6 are implemented:
 - Public active catalog-rule and cart-rule summaries
 - Coupon-code disclosure only through the configured public coupon allow-list
 - Executable `get_active_promotions` with optional SKU relevance filtering
+- Same-origin customer assertion endpoint for logged-in Magento customers
+- Customer-owned order status serialization without addresses, email, payment,
+  invoices, credit memos, or internal comments
+- Executable `get_order_status` with customer assertion proof
 
-The remaining commerce tool handler is intentionally unavailable until
-their implementation phase is completed.
+All seven approved commerce tool handlers are implemented. Phase M8 is reserved
+for hardening, rate limiting, profiling, and final contract verification.
 
 ## Installation
 

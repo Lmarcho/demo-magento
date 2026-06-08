@@ -73,6 +73,18 @@
                     <label>Public Chat Coupon Codes</label>
                     <comment>Comma-separated coupon codes that are approved for MCP chatbot display.</comment>
                 </field>
+                <field id="customer_assertion_lifetime_seconds" translate="label comment" type="text"
+                       sortOrder="130" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Customer Assertion Lifetime (seconds)</label>
+                    <validate>validate-digits validate-greater-than-zero</validate>
+                    <comment>Clamped by the module to 60 through 300 seconds.</comment>
+                </field>
+                <field id="customer_assertion_signing_key" translate="label comment" type="obscure"
+                       sortOrder="140" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Customer Assertion Signing Key</label>
+                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                    <comment>Optional dedicated HMAC key. When empty, Magento's crypt key is used.</comment>
+                </field>
             </group>
         </section>
     </system>

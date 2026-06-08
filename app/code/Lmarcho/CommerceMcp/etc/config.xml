@@ -16,6 +16,8 @@
                 <max_related_products>6</max_related_products>
                 <max_promotions>20</max_promotions>
                 <public_coupon_codes/>
+                <customer_assertion_lifetime_seconds>180</customer_assertion_lifetime_seconds>
+                <customer_assertion_signing_key/>
             </general>
         </commerce_mcp>
     </default>

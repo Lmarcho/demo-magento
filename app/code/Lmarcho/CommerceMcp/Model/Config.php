@@ -20,6 +20,8 @@ class Config
     private const XML_PATH_MAX_RELATED_PRODUCTS = 'commerce_mcp/general/max_related_products';
     private const XML_PATH_MAX_PROMOTIONS = 'commerce_mcp/general/max_promotions';
     private const XML_PATH_PUBLIC_COUPON_CODES = 'commerce_mcp/general/public_coupon_codes';
+    private const XML_PATH_ASSERTION_LIFETIME = 'commerce_mcp/general/customer_assertion_lifetime_seconds';
+    private const XML_PATH_ASSERTION_SIGNING_KEY = 'commerce_mcp/general/customer_assertion_signing_key';
 
     public function __construct(private readonly ScopeConfigInterface $scopeConfig)
     {
@@ -101,5 +103,17 @@ class Config
         });
 
         return array_values(array_unique(array_map('strtoupper', $codes)));
+    }
+
+    public function getCustomerAssertionLifetimeSeconds(): int
+    {
+        $lifetime = (int)$this->scopeConfig->getValue(self::XML_PATH_ASSERTION_LIFETIME);
+
+        return min(300, max(60, $lifetime));
+    }
+
+    public function getCustomerAssertionSigningKey(): string
+    {
+        return trim((string)$this->scopeConfig->getValue(self::XML_PATH_ASSERTION_SIGNING_KEY));
     }
 }

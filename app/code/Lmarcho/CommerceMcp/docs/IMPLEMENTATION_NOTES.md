@@ -159,3 +159,31 @@
   and description with safe fallbacks. A later admin-hardening pass can add
   dedicated module-owned public label/visibility fields if the tenant needs to
   separate internal rule names from chatbot copy.
+
+## Phase M7 decisions
+
+- `POST /commerce-mcp/customer/assertion` issues a short-lived customer
+  assertion only from the active Magento customer session. The endpoint accepts
+  no customer ID from request input and validates the Magento form key.
+- Assertions are signed with HMAC-SHA256 over a base64url-encoded JSON payload.
+  Claims include issuer, audience, customer ID, store ID, website ID, issued
+  time, expiry, and nonce.
+- Assertion lifetime is configured by
+  `commerce_mcp/general/customer_assertion_lifetime_seconds` and clamped to
+  60 through 300 seconds. A dedicated encrypted signing key can be configured;
+  local development falls back to Magento's deployment crypt key.
+- `get_order_status` requires store code, order number, and customer assertion.
+  Browser-supplied customer IDs, emails, login flags, or guest order data are
+  never trusted.
+- Assertion verification checks signature, issuer, audience, expiry, store ID,
+  and website ID before order ownership is evaluated.
+- Orders are loaded by increment ID and store ID, then allowed only when the
+  order customer ID equals the assertion customer ID. Missing and unauthorized
+  orders return the same `ORDER_NOT_ACCESSIBLE` public error.
+- The serializer returns order number, status, status label, placed date,
+  currency, grand total, visible item SKU/name/quantity, shipment numbers, and
+  tracking carrier/title/number.
+- Tracking URLs are currently `null` until Phase M8 adds an explicit carrier URL
+  allow-list. The serializer does not return addresses, email, phone, payment
+  data, internal comments, invoices, credit memos, fraud/risk data, or raw
+  order payloads.
