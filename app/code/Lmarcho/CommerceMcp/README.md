@@ -4,7 +4,7 @@ Magento-native, authenticated, read-only MCP server for live commerce data.
 
 ## Current status
 
-Phases M1 through M7 are implemented:
+Phases M1 through M8 are implemented:
 
 - `POST /commerce-mcp`
 - JSON-RPC 2.0
@@ -44,9 +44,11 @@ Phases M1 through M7 are implemented:
 - Customer-owned order status serialization without addresses, email, payment,
   invoices, credit memos, or internal comments
 - Executable `get_order_status` with customer assertion proof
+- Per-client and order-status-specific rate limiting
+- Sanitized MCP request/response logging and timing metadata
+- Configured HTTPS tracking URL templates by carrier code
 
-All seven approved commerce tool handlers are implemented. Phase M8 is reserved
-for hardening, rate limiting, profiling, and final contract verification.
+All seven approved commerce tool handlers are implemented.
 
 ## Installation
 

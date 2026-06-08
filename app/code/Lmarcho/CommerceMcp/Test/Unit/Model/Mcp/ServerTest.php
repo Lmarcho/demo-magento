@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Lmarcho\CommerceMcp\Test\Unit\Model\Mcp;
 
+use Lmarcho\CommerceMcp\Model\Config;
 use Lmarcho\CommerceMcp\Model\Mcp\JsonRpcParser;
 use Lmarcho\CommerceMcp\Model\Mcp\ProtocolNegotiator;
 use Lmarcho\CommerceMcp\Model\Mcp\ResponseBuilder;
 use Lmarcho\CommerceMcp\Model\Mcp\Server;
 use Lmarcho\CommerceMcp\Model\Mcp\ToolRegistry;
+use Lmarcho\CommerceMcp\Service\RateLimiter;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 
@@ -23,6 +25,8 @@ class ServerTest extends TestCase
             new ProtocolNegotiator(),
             new ResponseBuilder(),
             new ToolRegistry(),
+            $this->createMock(Config::class),
+            $this->createMock(RateLimiter::class),
             new NullLogger()
         );
     }

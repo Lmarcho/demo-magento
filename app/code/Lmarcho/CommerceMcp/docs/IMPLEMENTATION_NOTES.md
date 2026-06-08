@@ -183,7 +183,28 @@
 - The serializer returns order number, status, status label, placed date,
   currency, grand total, visible item SKU/name/quantity, shipment numbers, and
   tracking carrier/title/number.
-- Tracking URLs are currently `null` until Phase M8 adds an explicit carrier URL
-  allow-list. The serializer does not return addresses, email, phone, payment
-  data, internal comments, invoices, credit memos, fraud/risk data, or raw
-  order payloads.
+- Tracking URLs are `null` unless a later configured carrier template permits
+  the carrier code. The serializer does not return addresses, email, phone,
+  payment data, internal comments, invoices, credit memos, fraud/risk data, or
+  raw order payloads.
+
+## Phase M8 decisions
+
+- Authenticated MCP calls are rate limited per client with a fixed one-minute
+  file-backed bucket under Magento `var/commerce_mcp/rate_limit`.
+- `get_order_status` has an additional, stricter per-client bucket controlled
+  by `commerce_mcp/general/order_status_rate_limit_per_minute`.
+- Logs include correlation ID, client ID, tool name, store code, SKU count,
+  customer-assertion presence, duration, response byte size, access denial, and
+  rate-limit events.
+- Logs intentionally omit bearer tokens, authorization headers, raw customer
+  assertions, full order numbers, customer identifiers from assertions, and
+  unbounded request/response payloads.
+- Tracking URLs are generated only from configured HTTPS templates in
+  `commerce_mcp/general/tracking_url_templates`. Templates are keyed by carrier
+  code and must contain `{tracking_number}`. Invalid, non-HTTPS, or incomplete
+  templates are ignored.
+- Final contract verification covers missing/invalid token handling, tool
+  discovery, representative successful calls for every implemented tool, partial
+  product errors, promotion coupon privacy, and owned/missing/unauthorized order
+  status behavior.

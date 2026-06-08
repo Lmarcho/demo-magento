@@ -22,6 +22,9 @@ class Config
     private const XML_PATH_PUBLIC_COUPON_CODES = 'commerce_mcp/general/public_coupon_codes';
     private const XML_PATH_ASSERTION_LIFETIME = 'commerce_mcp/general/customer_assertion_lifetime_seconds';
     private const XML_PATH_ASSERTION_SIGNING_KEY = 'commerce_mcp/general/customer_assertion_signing_key';
+    private const XML_PATH_RATE_LIMIT_PER_MINUTE = 'commerce_mcp/general/rate_limit_per_minute';
+    private const XML_PATH_ORDER_STATUS_RATE_LIMIT_PER_MINUTE = 'commerce_mcp/general/order_status_rate_limit_per_minute';
+    private const XML_PATH_TRACKING_URL_TEMPLATES = 'commerce_mcp/general/tracking_url_templates';
 
     public function __construct(private readonly ScopeConfigInterface $scopeConfig)
     {
@@ -115,5 +118,42 @@ class Config
     public function getCustomerAssertionSigningKey(): string
     {
         return trim((string)$this->scopeConfig->getValue(self::XML_PATH_ASSERTION_SIGNING_KEY));
+    }
+
+    public function getRateLimitPerMinute(): int
+    {
+        return max(1, (int)$this->scopeConfig->getValue(self::XML_PATH_RATE_LIMIT_PER_MINUTE));
+    }
+
+    public function getOrderStatusRateLimitPerMinute(): int
+    {
+        return max(1, (int)$this->scopeConfig->getValue(self::XML_PATH_ORDER_STATUS_RATE_LIMIT_PER_MINUTE));
+    }
+
+    /**
+     * @return array<string,string>
+     */
+    public function getTrackingUrlTemplates(): array
+    {
+        $configured = trim((string)$this->scopeConfig->getValue(self::XML_PATH_TRACKING_URL_TEMPLATES));
+        if ($configured === '') {
+            return [];
+        }
+        $templates = [];
+        foreach (preg_split('/\R+/', $configured, -1, PREG_SPLIT_NO_EMPTY) ?: [] as $line) {
+            [$carrier, $template] = array_pad(explode('=', $line, 2), 2, '');
+            $carrier = strtolower(trim($carrier));
+            $template = trim($template);
+            if ($carrier === '' || !str_contains($template, '{tracking_number}')) {
+                continue;
+            }
+            $host = parse_url($template, PHP_URL_HOST);
+            if (!is_string($host) || $host === '' || parse_url($template, PHP_URL_SCHEME) !== 'https') {
+                continue;
+            }
+            $templates[$carrier] = $template;
+        }
+
+        return $templates;
     }
 }

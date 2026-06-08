@@ -78,4 +78,17 @@ class ConfigTest extends TestCase
 
         self::assertSame(300, (new Config($scopeConfig))->getCustomerAssertionLifetimeSeconds());
     }
+
+    public function testTrackingTemplatesRequireHttpsAndTrackingPlaceholder(): void
+    {
+        $scopeConfig = $this->createMock(ScopeConfigInterface::class);
+        $scopeConfig->method('getValue')
+            ->with('commerce_mcp/general/tracking_url_templates')
+            ->willReturn("ups=https://ups.example/track/{tracking_number}\nbad=http://bad.test/{tracking_number}\nempty=https://ok.test/nope");
+
+        self::assertSame(
+            ['ups' => 'https://ups.example/track/{tracking_number}'],
+            (new Config($scopeConfig))->getTrackingUrlTemplates()
+        );
+    }
 }

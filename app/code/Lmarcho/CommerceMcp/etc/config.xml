@@ -18,6 +18,9 @@
                 <public_coupon_codes/>
                 <customer_assertion_lifetime_seconds>180</customer_assertion_lifetime_seconds>
                 <customer_assertion_signing_key/>
+                <rate_limit_per_minute>120</rate_limit_per_minute>
+                <order_status_rate_limit_per_minute>20</order_status_rate_limit_per_minute>
+                <tracking_url_templates/>
             </general>
         </commerce_mcp>
     </default>

@@ -9,6 +9,7 @@ use Lmarcho\CommerceMcp\Model\Config;
 use Lmarcho\CommerceMcp\Model\Mcp\ResponseBuilder;
 use Lmarcho\CommerceMcp\Model\Mcp\Server;
 use Lmarcho\CommerceMcp\Service\CorrelationId;
+use Lmarcho\CommerceMcp\Service\RateLimiter;
 use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Framework\App\CsrfAwareActionInterface;
 use Magento\Framework\App\Request\InvalidRequestException;
@@ -26,6 +27,7 @@ class Index implements HttpPostActionInterface, CsrfAwareActionInterface
         private readonly Config $config,
         private readonly AuthenticationServiceInterface $authenticationService,
         private readonly CorrelationId $correlationId,
+        private readonly RateLimiter $rateLimiter,
         private readonly ResponseBuilder $responseBuilder,
         private readonly Server $server,
         private readonly LoggerInterface $logger
@@ -78,7 +80,27 @@ class Index implements HttpPostActionInterface, CsrfAwareActionInterface
             );
         }
 
-        $response = $this->server->handle($payload, $correlationId, $client->getAllowedTools());
+        if (!$this->rateLimiter->isAllowed(
+            'mcp_client:' . $client->getClientId(),
+            $this->config->getRateLimitPerMinute()
+        )) {
+            $this->logger->warning('Commerce MCP client rate limited', [
+                'correlation_id' => $correlationId,
+                'client_id' => $client->getClientId(),
+            ]);
+            return $this->jsonResponse(
+                $this->responseBuilder->error(null, -32007, 'Rate limit exceeded', $correlationId),
+                429,
+                $correlationId
+            );
+        }
+
+        $response = $this->server->handle(
+            $payload,
+            $correlationId,
+            $client->getAllowedTools(),
+            $client->getClientId()
+        );
         if ($response === null) {
             return $this->rawFactory->create()
                 ->setHttpResponseCode(202)
@@ -94,7 +116,13 @@ class Index implements HttpPostActionInterface, CsrfAwareActionInterface
                 'Response too large',
                 $correlationId
             );
+            $encoded = json_encode($response, JSON_UNESCAPED_SLASHES);
         }
+        $this->logger->info('Commerce MCP response completed', [
+            'correlation_id' => $correlationId,
+            'client_id' => $client->getClientId(),
+            'response_bytes' => is_string($encoded) ? strlen($encoded) : null,
+        ]);
 
         return $this->jsonResponse($response, 200, $correlationId);
     }

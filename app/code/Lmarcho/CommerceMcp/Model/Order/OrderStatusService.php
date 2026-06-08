@@ -8,6 +8,7 @@ use Lmarcho\CommerceMcp\Api\CustomerAssertionServiceInterface;
 use Lmarcho\CommerceMcp\Api\OrderStatusServiceInterface;
 use Lmarcho\CommerceMcp\Api\StoreContextResolverInterface;
 use Lmarcho\CommerceMcp\Exception\JsonRpcException;
+use Lmarcho\CommerceMcp\Model\Config;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Api\SortOrderBuilder;
 use Magento\Sales\Api\OrderRepositoryInterface;
@@ -18,6 +19,7 @@ class OrderStatusService implements OrderStatusServiceInterface
     public function __construct(
         private readonly StoreContextResolverInterface $storeContextResolver,
         private readonly CustomerAssertionServiceInterface $customerAssertionService,
+        private readonly Config $config,
         private readonly OrderRepositoryInterface $orderRepository,
         private readonly SearchCriteriaBuilder $searchCriteriaBuilder,
         private readonly SortOrderBuilder $sortOrderBuilder
@@ -110,10 +112,11 @@ class OrderStatusService implements OrderStatusServiceInterface
         foreach ($collection as $shipment) {
             $tracks = [];
             foreach ($shipment->getAllTracks() as $track) {
+                $trackingNumber = (string)$track->getTrackNumber();
                 $tracks[] = [
                     'carrier' => (string)($track->getTitle() ?: $track->getCarrierCode()),
-                    'tracking_number' => (string)$track->getTrackNumber(),
-                    'tracking_url' => null,
+                    'tracking_number' => $trackingNumber,
+                    'tracking_url' => $this->trackingUrl((string)$track->getCarrierCode(), $trackingNumber),
                 ];
             }
             $shipments[] = [
@@ -123,6 +126,16 @@ class OrderStatusService implements OrderStatusServiceInterface
         }
 
         return $shipments;
+    }
+
+    private function trackingUrl(string $carrierCode, string $trackingNumber): ?string
+    {
+        $template = $this->config->getTrackingUrlTemplates()[strtolower($carrierCode)] ?? null;
+        if ($template === null || $trackingNumber === '') {
+            return null;
+        }
+
+        return str_replace('{tracking_number}', rawurlencode($trackingNumber), $template);
     }
 
     private function dateToUtc(mixed $date): ?string

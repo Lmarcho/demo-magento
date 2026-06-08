@@ -2,7 +2,7 @@
     "name": "lmarcho/module-commerce-mcp",
     "description": "Authenticated, read-only commerce MCP server for Magento 2.",
     "type": "magento2-module",
-    "version": "0.7.0",
+    "version": "0.8.0",
     "license": "proprietary",
     "require": {
         "php": "~8.1.0 || ~8.2.0 || ~8.3.0",

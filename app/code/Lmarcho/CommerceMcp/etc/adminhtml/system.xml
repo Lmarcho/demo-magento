@@ -85,6 +85,21 @@
                     <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
                     <comment>Optional dedicated HMAC key. When empty, Magento's crypt key is used.</comment>
                 </field>
+                <field id="rate_limit_per_minute" translate="label comment" type="text" sortOrder="150"
+                       showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Request Rate Limit Per Minute</label>
+                    <validate>validate-digits validate-greater-than-zero</validate>
+                </field>
+                <field id="order_status_rate_limit_per_minute" translate="label comment" type="text"
+                       sortOrder="160" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Order Status Rate Limit Per Minute</label>
+                    <validate>validate-digits validate-greater-than-zero</validate>
+                </field>
+                <field id="tracking_url_templates" translate="label comment" type="textarea" sortOrder="170"
+                       showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Tracking URL Templates</label>
+                    <comment>One HTTPS template per line: carrier_code=https://carrier.example/track/{tracking_number}</comment>
+                </field>
             </group>
         </section>
     </system>

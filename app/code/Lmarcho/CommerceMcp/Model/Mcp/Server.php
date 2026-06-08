@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Lmarcho\CommerceMcp\Model\Mcp;
 
 use Lmarcho\CommerceMcp\Exception\JsonRpcException;
+use Lmarcho\CommerceMcp\Model\Config;
+use Lmarcho\CommerceMcp\Service\RateLimiter;
 use Psr\Log\LoggerInterface;
 
 class Server
@@ -14,12 +16,18 @@ class Server
         private readonly ProtocolNegotiator $protocolNegotiator,
         private readonly ResponseBuilder $responseBuilder,
         private readonly ToolRegistry $toolRegistry,
+        private readonly Config $config,
+        private readonly RateLimiter $rateLimiter,
         private readonly LoggerInterface $logger
     ) {
     }
 
-    public function handle(string $payload, string $correlationId, array $allowedTools): ?array
-    {
+    public function handle(
+        string $payload,
+        string $correlationId,
+        array $allowedTools,
+        ?int $clientId = null
+    ): ?array {
         $requestId = null;
 
         try {
@@ -40,7 +48,7 @@ class Server
                 'initialize' => $this->initialize($request),
                 'ping' => [],
                 'tools/list' => ['tools' => $this->toolRegistry->list($allowedTools)],
-                'tools/call' => $this->callTool($request, $allowedTools),
+                'tools/call' => $this->callTool($request, $allowedTools, $correlationId, $clientId),
                 default => throw new JsonRpcException('Method not found', -32601, $requestId),
             };
 
@@ -82,20 +90,43 @@ class Server
             ],
             'serverInfo' => [
                 'name' => 'Lmarcho Commerce MCP',
-                'version' => '0.7.0',
+                'version' => '0.8.0',
             ],
             'instructions' => 'Read-only public commerce tools. Order status requires customer proof.',
         ];
     }
 
-    private function callTool(array $request, array $allowedTools): array
-    {
+    private function callTool(
+        array $request,
+        array $allowedTools,
+        string $correlationId,
+        ?int $clientId
+    ): array {
         $name = $request['params']['name'] ?? null;
         if (!is_string($name) || !$this->toolRegistry->exists($name)) {
             throw new JsonRpcException('Unknown tool', -32602, $request['id']);
         }
         if (!in_array($name, $allowedTools, true)) {
+            $this->logger->warning('Commerce MCP tool access denied', [
+                'correlation_id' => $correlationId,
+                'client_id' => $clientId,
+                'tool' => $name,
+            ]);
             throw new JsonRpcException('Access denied', -32003, $request['id']);
+        }
+        if ($name === 'get_order_status'
+            && $clientId !== null
+            && !$this->rateLimiter->isAllowed(
+                'order_status:' . $clientId,
+                $this->config->getOrderStatusRateLimitPerMinute()
+            )
+        ) {
+            $this->logger->warning('Commerce MCP order status rate limited', [
+                'correlation_id' => $correlationId,
+                'client_id' => $clientId,
+                'tool' => $name,
+            ]);
+            throw new JsonRpcException('Rate limit exceeded', -32007, $request['id']);
         }
 
         $tool = $this->toolRegistry->getImplemented($name);
@@ -113,6 +144,40 @@ class Server
             throw new JsonRpcException('Invalid tool arguments', -32602, $request['id']);
         }
 
-        return $tool->execute($arguments);
+        $started = microtime(true);
+        try {
+            $result = $tool->execute($arguments);
+        } finally {
+            $this->logger->info('Commerce MCP tool call completed', [
+                'correlation_id' => $correlationId,
+                'client_id' => $clientId,
+                'tool' => $name,
+                'store_code' => $this->safeString($arguments['store_code'] ?? null),
+                'sku_count' => $this->countList($arguments['skus'] ?? null),
+                'has_customer_assertion' => isset($arguments['customer_assertion']),
+                'duration_ms' => round((microtime(true) - $started) * 1000, 2),
+            ]);
+        }
+
+        if (($result['structuredContent']['errors'] ?? []) !== []) {
+            $this->logger->info('Commerce MCP tool partial errors', [
+                'correlation_id' => $correlationId,
+                'client_id' => $clientId,
+                'tool' => $name,
+                'partial_error_count' => count($result['structuredContent']['errors']),
+            ]);
+        }
+
+        return $result;
+    }
+
+    private function safeString(mixed $value): ?string
+    {
+        return is_string($value) && $value !== '' ? $value : null;
+    }
+
+    private function countList(mixed $value): ?int
+    {
+        return is_array($value) && array_is_list($value) ? count($value) : null;
     }
 }
