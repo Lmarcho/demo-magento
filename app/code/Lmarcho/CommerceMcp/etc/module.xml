@@ -4,6 +4,8 @@
     <module name="Lmarcho_CommerceMcp">
         <sequence>
             <module name="Magento_Store"/>
+            <module name="Magento_Catalog"/>
+            <module name="Magento_Tax"/>
             <module name="Magento_InventorySalesApi"/>
         </sequence>
     </module>

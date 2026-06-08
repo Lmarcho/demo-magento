@@ -4,7 +4,7 @@ Magento-native, authenticated, read-only MCP server for live commerce data.
 
 ## Current status
 
-Phases M1 and M2 are implemented:
+Phases M1 through M3 are implemented:
 
 - `POST /commerce-mcp`
 - JSON-RPC 2.0
@@ -20,8 +20,15 @@ Phases M1 and M2 are implemented:
 - Store-scoped currency, locale, timezone, secure link URL, and media URL
 - MSI website sales-channel and stock resolution
 - Executable `get_store_context` with MCP `structuredContent`
+- Batched, store-scoped public product loading
+- Enabled and storefront-visible product filtering
+- Magento product URL generation
+- Primary image and bounded media gallery resolution
+- Magento adjusted regular/final prices and discount metadata
+- Bulk MSI salability resolution
+- Executable `get_products_live` with partial per-SKU errors
 
-The remaining six commerce tool handlers are intentionally unavailable until
+The remaining five commerce tool handlers are intentionally unavailable until
 their implementation phase is completed.
 
 ## Installation

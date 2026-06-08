@@ -12,6 +12,8 @@ class Config
     private const XML_PATH_MAX_REQUEST_BYTES = 'commerce_mcp/general/max_request_bytes';
     private const XML_PATH_MAX_RESPONSE_BYTES = 'commerce_mcp/general/max_response_bytes';
     private const XML_PATH_ALLOWED_STORE_CODES = 'commerce_mcp/general/allowed_store_codes';
+    private const XML_PATH_MAX_SKUS_PER_REQUEST = 'commerce_mcp/general/max_skus_per_request';
+    private const XML_PATH_MAX_GALLERY_IMAGES = 'commerce_mcp/general/max_gallery_images';
 
     public function __construct(private readonly ScopeConfigInterface $scopeConfig)
     {
@@ -44,5 +46,15 @@ class Config
         });
 
         return array_values(array_unique($codes));
+    }
+
+    public function getMaxSkusPerRequest(): int
+    {
+        return max(1, (int)$this->scopeConfig->getValue(self::XML_PATH_MAX_SKUS_PER_REQUEST));
+    }
+
+    public function getMaxGalleryImages(): int
+    {
+        return max(1, (int)$this->scopeConfig->getValue(self::XML_PATH_MAX_GALLERY_IMAGES));
     }
 }

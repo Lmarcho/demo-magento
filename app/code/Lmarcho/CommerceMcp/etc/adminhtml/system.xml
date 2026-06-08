@@ -33,6 +33,16 @@
                     <label>Allowed Store Codes</label>
                     <comment>Comma-separated active storefront codes. The admin store is never allowed.</comment>
                 </field>
+                <field id="max_skus_per_request" translate="label comment" type="text" sortOrder="50"
+                       showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Maximum SKUs Per Request</label>
+                    <validate>validate-digits validate-greater-than-zero</validate>
+                </field>
+                <field id="max_gallery_images" translate="label comment" type="text" sortOrder="60"
+                       showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Maximum Gallery Images Per Product</label>
+                    <validate>validate-digits validate-greater-than-zero</validate>
+                </field>
             </group>
         </section>
     </system>

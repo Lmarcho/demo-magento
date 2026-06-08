@@ -5,12 +5,16 @@
                 type="Lmarcho\CommerceMcp\Model\Authentication\AuthenticationService"/>
     <preference for="Lmarcho\CommerceMcp\Api\StoreContextResolverInterface"
                 type="Lmarcho\CommerceMcp\Model\Store\StoreContextResolver"/>
+    <preference for="Lmarcho\CommerceMcp\Api\ProductHydratorInterface"
+                type="Lmarcho\CommerceMcp\Model\Product\ProductHydrator"/>
 
     <type name="Lmarcho\CommerceMcp\Model\Mcp\ToolRegistry">
         <arguments>
             <argument name="implementedTools" xsi:type="array">
                 <item name="get_store_context"
                       xsi:type="object">Lmarcho\CommerceMcp\Model\Tool\GetStoreContext</item>
+                <item name="get_products_live"
+                      xsi:type="object">Lmarcho\CommerceMcp\Model\Tool\GetProductsLive</item>
             </argument>
         </arguments>
     </type>

@@ -64,3 +64,26 @@
   `StockResolverInterface`.
 - The normalized tool response uses `schema_version: 1.0`, text content, and
   MCP `structuredContent`.
+
+## Phase M3 decisions
+
+- `get_products_live` accepts a store code, ordered SKU candidates, optional
+  sections, and a bounded gallery limit.
+- SKU candidates are validated, deduplicated, and limited before catalog work.
+- Products are loaded in one store-scoped collection query and retain candidate
+  order in the response.
+- Disabled and not-visible-individually products are excluded from this
+  customer-facing tool.
+- Product URLs come from Magento URL services with the secure flag.
+- Media gallery data is attached to the collection in bulk. Image paths use
+  Magento's media-path service and the requested store's secure media base URL.
+- Regular and final values use Magento adjusted pricing amounts. Discount
+  amount and percentage are derived only when regular price exceeds final
+  price.
+- Salability uses one `AreProductsSalableInterface` call for all loaded SKUs
+  and the stock ID resolved during Phase M2. Inventory failures return
+  `UNKNOWN` rather than physical source quantities.
+- Missing or excluded SKUs return bounded `PRODUCT_NOT_AVAILABLE` partial
+  errors without failing successful products.
+- The current Magento store is restored in a `finally` block after requested
+  store emulation.
