@@ -7,6 +7,10 @@
                 type="Lmarcho\CommerceMcp\Model\Store\StoreContextResolver"/>
     <preference for="Lmarcho\CommerceMcp\Api\ProductHydratorInterface"
                 type="Lmarcho\CommerceMcp\Model\Product\ProductHydrator"/>
+    <preference for="Lmarcho\CommerceMcp\Api\ProductVariantResolverInterface"
+                type="Lmarcho\CommerceMcp\Model\Product\VariantResolver"/>
+    <preference for="Lmarcho\CommerceMcp\Api\ProductVariantServiceInterface"
+                type="Lmarcho\CommerceMcp\Model\Product\ProductVariantService"/>
 
     <type name="Lmarcho\CommerceMcp\Model\Mcp\ToolRegistry">
         <arguments>
@@ -15,6 +19,8 @@
                       xsi:type="object">Lmarcho\CommerceMcp\Model\Tool\GetStoreContext</item>
                 <item name="get_products_live"
                       xsi:type="object">Lmarcho\CommerceMcp\Model\Tool\GetProductsLive</item>
+                <item name="get_product_variants"
+                      xsi:type="object">Lmarcho\CommerceMcp\Model\Tool\GetProductVariants</item>
             </argument>
         </arguments>
     </type>

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lmarcho\CommerceMcp\Model\Product;
 
 use Lmarcho\CommerceMcp\Api\ProductHydratorInterface;
+use Lmarcho\CommerceMcp\Api\ProductVariantResolverInterface;
 use Lmarcho\CommerceMcp\Api\StoreContextResolverInterface;
 use Lmarcho\CommerceMcp\Exception\JsonRpcException;
 use Lmarcho\CommerceMcp\Model\Config;
@@ -16,7 +17,14 @@ use Magento\Store\Model\StoreManagerInterface;
 
 class ProductHydrator implements ProductHydratorInterface
 {
-    private const SUPPORTED_SECTIONS = ['core', 'url', 'media', 'price', 'availability'];
+    private const SUPPORTED_SECTIONS = [
+        'core',
+        'url',
+        'media',
+        'price',
+        'availability',
+        'variants',
+    ];
 
     public function __construct(
         private readonly Config $config,
@@ -25,7 +33,8 @@ class ProductHydrator implements ProductHydratorInterface
         private readonly CollectionFactory $collectionFactory,
         private readonly PriceResolver $priceResolver,
         private readonly MediaResolver $mediaResolver,
-        private readonly AvailabilityResolver $availabilityResolver
+        private readonly AvailabilityResolver $availabilityResolver,
+        private readonly ProductVariantResolverInterface $variantResolver
     ) {
     }
 
@@ -33,7 +42,8 @@ class ProductHydrator implements ProductHydratorInterface
         string $storeCode,
         array $skus,
         array $sections,
-        ?int $galleryLimit = null
+        ?int $galleryLimit = null,
+        ?int $variantLimit = null
     ): array {
         $skus = $this->normalizeSkus($skus);
         $sections = $this->normalizeSections($sections);
@@ -114,9 +124,10 @@ class ProductHydrator implements ProductHydratorInterface
                     $products[] = $this->serialize(
                         $product,
                         $sections,
-                        $context->getCurrency(),
+                        $context,
                         $availability[$sku] ?? null,
-                        $limit
+                        $limit,
+                        $variantLimit
                     );
                 } catch (\Throwable) {
                     $errors[] = [
@@ -141,9 +152,10 @@ class ProductHydrator implements ProductHydratorInterface
     private function serialize(
         Product $product,
         array $sections,
-        string $currency,
+        \Lmarcho\CommerceMcp\Api\Data\StoreContextInterface $storeContext,
         ?array $availability,
-        int $galleryLimit
+        int $galleryLimit,
+        ?int $variantLimit
     ): array {
         $data = [
             'sku' => (string)$product->getSku(),
@@ -158,14 +170,21 @@ class ProductHydrator implements ProductHydratorInterface
             $data['media'] = $this->mediaResolver->resolve($product, $galleryLimit);
         }
         if (in_array('price', $sections, true)) {
-            $data['price'] = $this->priceResolver->resolve($product, $currency);
+            $data['price'] = $this->priceResolver->resolve(
+                $product,
+                $storeContext->getCurrency()
+            );
         }
         if (in_array('availability', $sections, true)) {
             $data['availability'] = $availability
                 ?? ['is_salable' => null, 'status' => 'UNKNOWN'];
         }
-        if ($product->getTypeId() === 'configurable') {
-            $data['capability_notes'] = ['Variants are available in Phase M4.'];
+        if (in_array('variants', $sections, true)) {
+            $data['variant_data'] = $this->variantResolver->resolve(
+                $product,
+                $storeContext,
+                $variantLimit
+            );
         }
 
         return $data;

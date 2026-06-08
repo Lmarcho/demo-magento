@@ -39,7 +39,7 @@ class GetProductsLiveTest extends TestCase
     {
         $hydrator = $this->createMock(ProductHydratorInterface::class);
         $hydrator->expects(self::once())->method('hydrate')
-            ->with('default', ['SKU-1', 'MISSING'], ['price'], 2)
+            ->with('default', ['SKU-1', 'MISSING'], ['price'], 2, null)
             ->willReturn([
                 'products' => [['sku' => 'SKU-1']],
                 'errors' => [[

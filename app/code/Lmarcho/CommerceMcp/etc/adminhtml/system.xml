@@ -43,6 +43,16 @@
                     <label>Maximum Gallery Images Per Product</label>
                     <validate>validate-digits validate-greater-than-zero</validate>
                 </field>
+                <field id="max_variants_per_product" translate="label comment" type="text" sortOrder="70"
+                       showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Maximum Variants Per Product</label>
+                    <validate>validate-digits validate-greater-than-zero</validate>
+                </field>
+                <field id="variant_image_fallback_enabled" translate="label comment" type="select"
+                       sortOrder="80" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Fallback to Parent Variant Image</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
             </group>
         </section>
     </system>

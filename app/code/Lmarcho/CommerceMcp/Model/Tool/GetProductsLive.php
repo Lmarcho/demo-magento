@@ -39,11 +39,19 @@ class GetProductsLive implements ToolInterface
                     'type' => 'array',
                     'items' => [
                         'type' => 'string',
-                        'enum' => ['core', 'url', 'media', 'price', 'availability'],
+                        'enum' => [
+                            'core',
+                            'url',
+                            'media',
+                            'price',
+                            'availability',
+                            'variants',
+                        ],
                     ],
                     'uniqueItems' => true,
                 ],
                 'gallery_limit' => ['type' => 'integer', 'minimum' => 1],
+                'variant_limit' => ['type' => 'integer', 'minimum' => 1],
             ],
             'required' => ['store_code', 'skus'],
             'additionalProperties' => false,
@@ -54,7 +62,7 @@ class GetProductsLive implements ToolInterface
     {
         if (array_diff(
             array_keys($arguments),
-            ['store_code', 'skus', 'sections', 'gallery_limit']
+            ['store_code', 'skus', 'sections', 'gallery_limit', 'variant_limit']
         ) !== []) {
             throw $this->invalidArguments('UNKNOWN_ARGUMENT');
         }
@@ -72,12 +80,17 @@ class GetProductsLive implements ToolInterface
         if ($galleryLimit !== null && (!is_int($galleryLimit) || $galleryLimit < 1)) {
             throw $this->invalidArguments('INVALID_GALLERY_LIMIT');
         }
+        $variantLimit = $arguments['variant_limit'] ?? null;
+        if ($variantLimit !== null && (!is_int($variantLimit) || $variantLimit < 1)) {
+            throw $this->invalidArguments('INVALID_VARIANT_LIMIT');
+        }
 
         $result = $this->productHydrator->hydrate(
             $arguments['store_code'],
             $arguments['skus'],
             $sections,
-            $galleryLimit
+            $galleryLimit,
+            $variantLimit
         );
         $structuredContent = [
             'schema_version' => '1.0',

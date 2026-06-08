@@ -22,4 +22,19 @@ class ConfigTest extends TestCase
             (new Config($scopeConfig))->getAllowedStoreCodes()
         );
     }
+
+    public function testVariantPoliciesUseConfiguredValues(): void
+    {
+        $scopeConfig = $this->createMock(ScopeConfigInterface::class);
+        $scopeConfig->method('getValue')
+            ->with('commerce_mcp/general/max_variants_per_product')
+            ->willReturn(12);
+        $scopeConfig->method('isSetFlag')
+            ->with('commerce_mcp/general/variant_image_fallback_enabled')
+            ->willReturn(true);
+        $config = new Config($scopeConfig);
+
+        self::assertSame(12, $config->getMaxVariantsPerProduct());
+        self::assertTrue($config->isVariantImageFallbackEnabled());
+    }
 }

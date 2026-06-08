@@ -15,6 +15,7 @@ interface ProductHydratorInterface
         string $storeCode,
         array $skus,
         array $sections,
-        ?int $galleryLimit = null
+        ?int $galleryLimit = null,
+        ?int $variantLimit = null
     ): array;
 }

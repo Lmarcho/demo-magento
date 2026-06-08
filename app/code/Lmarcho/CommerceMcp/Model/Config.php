@@ -14,6 +14,8 @@ class Config
     private const XML_PATH_ALLOWED_STORE_CODES = 'commerce_mcp/general/allowed_store_codes';
     private const XML_PATH_MAX_SKUS_PER_REQUEST = 'commerce_mcp/general/max_skus_per_request';
     private const XML_PATH_MAX_GALLERY_IMAGES = 'commerce_mcp/general/max_gallery_images';
+    private const XML_PATH_MAX_VARIANTS_PER_PRODUCT = 'commerce_mcp/general/max_variants_per_product';
+    private const XML_PATH_VARIANT_IMAGE_FALLBACK = 'commerce_mcp/general/variant_image_fallback_enabled';
 
     public function __construct(private readonly ScopeConfigInterface $scopeConfig)
     {
@@ -56,5 +58,15 @@ class Config
     public function getMaxGalleryImages(): int
     {
         return max(1, (int)$this->scopeConfig->getValue(self::XML_PATH_MAX_GALLERY_IMAGES));
+    }
+
+    public function getMaxVariantsPerProduct(): int
+    {
+        return max(1, (int)$this->scopeConfig->getValue(self::XML_PATH_MAX_VARIANTS_PER_PRODUCT));
+    }
+
+    public function isVariantImageFallbackEnabled(): bool
+    {
+        return $this->scopeConfig->isSetFlag(self::XML_PATH_VARIANT_IMAGE_FALLBACK);
     }
 }

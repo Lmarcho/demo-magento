@@ -87,3 +87,27 @@
   errors without failing successful products.
 - The current Magento store is restored in a `finally` block after requested
   store emulation.
+
+## Phase M4 decisions
+
+- `get_product_variants` accepts a store code, parent SKU, and optional bounded
+  variant limit. Simple products return empty option and variant collections.
+- Configurable option metadata comes from Magento's configurable attribute
+  model and remains complete when the returned child collection is truncated.
+- Enabled child products are loaded in store scope with deterministic entity ID
+  ordering. The response reports total, returned, and truncated counts.
+- Child option values include attribute codes, frontend labels, raw values, and
+  store-scoped option labels.
+- Child prices use the same Magento adjusted-price resolver as product
+  hydration. Availability is resolved in one bulk MSI request for the requested
+  store's website stock.
+- Variant media prefers the child primary image. When
+  `commerce_mcp/product/variant_image_fallback_enabled` is enabled, a missing
+  child image falls back to the parent primary image and is explicitly marked.
+- `get_products_live` can include a `variants` section with its own bounded
+  limit. The server maximum is configured by
+  `commerce_mcp/product/max_variants_per_product`.
+- The local sample catalog verifies configurable options, truncation, child
+  availability, and child media. Its configurable children have equal prices,
+  so ranged configurable pricing is implemented through Magento's pricing
+  model but could not be live-verified against a varied-price fixture.
