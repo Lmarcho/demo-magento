@@ -18,6 +18,8 @@ class Config
     private const XML_PATH_VARIANT_IMAGE_FALLBACK = 'commerce_mcp/general/variant_image_fallback_enabled';
     private const XML_PATH_MAX_SEARCH_RESULTS = 'commerce_mcp/general/max_search_results';
     private const XML_PATH_MAX_RELATED_PRODUCTS = 'commerce_mcp/general/max_related_products';
+    private const XML_PATH_MAX_PROMOTIONS = 'commerce_mcp/general/max_promotions';
+    private const XML_PATH_PUBLIC_COUPON_CODES = 'commerce_mcp/general/public_coupon_codes';
 
     public function __construct(private readonly ScopeConfigInterface $scopeConfig)
     {
@@ -80,5 +82,24 @@ class Config
     public function getMaxRelatedProducts(): int
     {
         return max(1, (int)$this->scopeConfig->getValue(self::XML_PATH_MAX_RELATED_PRODUCTS));
+    }
+
+    public function getMaxPromotions(): int
+    {
+        return max(1, (int)$this->scopeConfig->getValue(self::XML_PATH_MAX_PROMOTIONS));
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getPublicCouponCodes(): array
+    {
+        $configured = (string)$this->scopeConfig->getValue(self::XML_PATH_PUBLIC_COUPON_CODES);
+        $codes = preg_split('/\s*,\s*/', trim($configured), -1, PREG_SPLIT_NO_EMPTY) ?: [];
+        $codes = array_filter($codes, static function (string $code): bool {
+            return $code !== '' && strlen($code) <= 64;
+        });
+
+        return array_values(array_unique(array_map('strtoupper', $codes)));
     }
 }

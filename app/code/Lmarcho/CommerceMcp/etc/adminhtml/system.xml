@@ -63,6 +63,16 @@
                     <label>Maximum Related Products Per Link Type</label>
                     <validate>validate-digits validate-greater-than-zero</validate>
                 </field>
+                <field id="max_promotions" translate="label comment" type="text" sortOrder="110"
+                       showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Maximum Promotions Per Request</label>
+                    <validate>validate-digits validate-greater-than-zero</validate>
+                </field>
+                <field id="public_coupon_codes" translate="label comment" type="textarea" sortOrder="120"
+                       showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Public Chat Coupon Codes</label>
+                    <comment>Comma-separated coupon codes that are approved for MCP chatbot display.</comment>
+                </field>
             </group>
         </section>
     </system>

@@ -14,6 +14,8 @@
                 <variant_image_fallback_enabled>1</variant_image_fallback_enabled>
                 <max_search_results>10</max_search_results>
                 <max_related_products>6</max_related_products>
+                <max_promotions>20</max_promotions>
+                <public_coupon_codes/>
             </general>
         </commerce_mcp>
     </default>

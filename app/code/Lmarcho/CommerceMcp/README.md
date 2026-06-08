@@ -4,7 +4,7 @@ Magento-native, authenticated, read-only MCP server for live commerce data.
 
 ## Current status
 
-Phases M1 through M5 are implemented:
+Phases M1 through M6 are implemented:
 
 - `POST /commerce-mcp`
 - JSON-RPC 2.0
@@ -37,8 +37,11 @@ Phases M1 through M5 are implemented:
 - Executable `search_products_live` with normalized product hydration
 - Related, upsell, and cross-sell product link resolution
 - Executable `get_related_products` with per-link limits and link positions
+- Public active catalog-rule and cart-rule summaries
+- Coupon-code disclosure only through the configured public coupon allow-list
+- Executable `get_active_promotions` with optional SKU relevance filtering
 
-The remaining two commerce tool handlers are intentionally unavailable until
+The remaining commerce tool handler is intentionally unavailable until
 their implementation phase is completed.
 
 ## Installation

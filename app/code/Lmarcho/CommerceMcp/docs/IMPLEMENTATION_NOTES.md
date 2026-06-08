@@ -133,3 +133,29 @@
   linked products through `ProductHydrator`.
 - Related product hydration is intentionally non-recursive; linked products do
   not include their own related-product groups.
+
+## Phase M6 decisions
+
+- `get_active_promotions` accepts a store code, optional SKU list, optional
+  promotion types (`catalog`, `cart`), and a bounded result limit.
+- Store resolution follows the same allow-listed public storefront path as the
+  product tools. Promotion lookups use the resolved website ID and the
+  anonymous `NOT LOGGED IN` customer group.
+- Catalog rules are filtered by website, customer group, active flag, and
+  current UTC date. They are reported as summaries only; catalog-rule discounts
+  are not added to product prices because Magento already reflects them in
+  final price calculations.
+- Cart rules use Magento's sales-rule validation collection with website,
+  customer group, active-date, and no-coupon/public-coupon filtering. Cart rule
+  eligibility is always `POTENTIALLY_ELIGIBLE` until a real cart is evaluated.
+- Coupon rules are returned only when their coupon code is present in
+  `commerce_mcp/general/public_coupon_codes`. Auto-generated and private
+  coupon codes are not disclosed.
+- Native rule conditions and serialized action data are never exposed.
+- When SKUs are supplied, catalog rules are checked against rule conditions and
+  cart rules are checked against action conditions where possible. Complex cart
+  conditions remain potentially eligible and are not serialized.
+- Public labels and descriptions currently come from Magento's native rule name
+  and description with safe fallbacks. A later admin-hardening pass can add
+  dedicated module-owned public label/visibility fields if the tenant needs to
+  separate internal rule names from chatbot copy.

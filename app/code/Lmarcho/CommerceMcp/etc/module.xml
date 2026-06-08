@@ -5,8 +5,10 @@
         <sequence>
             <module name="Magento_Store"/>
             <module name="Magento_Catalog"/>
+            <module name="Magento_CatalogRule"/>
             <module name="Magento_CatalogSearch"/>
             <module name="Magento_ConfigurableProduct"/>
+            <module name="Magento_SalesRule"/>
             <module name="Magento_Tax"/>
             <module name="Magento_InventorySalesApi"/>
         </sequence>

@@ -45,6 +45,7 @@ class ConfigTest extends TestCase
             static fn(string $path): int => match ($path) {
                 'commerce_mcp/general/max_search_results' => 8,
                 'commerce_mcp/general/max_related_products' => 4,
+                'commerce_mcp/general/max_promotions' => 9,
                 default => 0,
             }
         );
@@ -52,5 +53,19 @@ class ConfigTest extends TestCase
 
         self::assertSame(8, $config->getMaxSearchResults());
         self::assertSame(4, $config->getMaxRelatedProducts());
+        self::assertSame(9, $config->getMaxPromotions());
+    }
+
+    public function testPublicCouponCodesAreNormalized(): void
+    {
+        $scopeConfig = $this->createMock(ScopeConfigInterface::class);
+        $scopeConfig->method('getValue')
+            ->with('commerce_mcp/general/public_coupon_codes')
+            ->willReturn(' summer10, SUMMER10, welcome ');
+
+        self::assertSame(
+            ['SUMMER10', 'WELCOME'],
+            (new Config($scopeConfig))->getPublicCouponCodes()
+        );
     }
 }

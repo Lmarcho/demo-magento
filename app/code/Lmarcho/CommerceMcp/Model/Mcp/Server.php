@@ -82,7 +82,7 @@ class Server
             ],
             'serverInfo' => [
                 'name' => 'Lmarcho Commerce MCP',
-                'version' => '0.5.0',
+                'version' => '0.6.0',
             ],
             'instructions' => 'Read-only public commerce tools. Order status requires customer proof.',
         ];
