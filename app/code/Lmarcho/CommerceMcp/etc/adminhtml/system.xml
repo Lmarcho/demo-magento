@@ -53,6 +53,16 @@
                     <label>Fallback to Parent Variant Image</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
+                <field id="max_search_results" translate="label comment" type="text" sortOrder="90"
+                       showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Maximum Search Results</label>
+                    <validate>validate-digits validate-greater-than-zero</validate>
+                </field>
+                <field id="max_related_products" translate="label comment" type="text" sortOrder="100"
+                       showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Maximum Related Products Per Link Type</label>
+                    <validate>validate-digits validate-greater-than-zero</validate>
+                </field>
             </group>
         </section>
     </system>

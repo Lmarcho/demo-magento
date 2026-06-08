@@ -37,4 +37,20 @@ class ConfigTest extends TestCase
         self::assertSame(12, $config->getMaxVariantsPerProduct());
         self::assertTrue($config->isVariantImageFallbackEnabled());
     }
+
+    public function testSearchAndRelatedLimitsUseConfiguredValues(): void
+    {
+        $scopeConfig = $this->createMock(ScopeConfigInterface::class);
+        $scopeConfig->method('getValue')->willReturnCallback(
+            static fn(string $path): int => match ($path) {
+                'commerce_mcp/general/max_search_results' => 8,
+                'commerce_mcp/general/max_related_products' => 4,
+                default => 0,
+            }
+        );
+        $config = new Config($scopeConfig);
+
+        self::assertSame(8, $config->getMaxSearchResults());
+        self::assertSame(4, $config->getMaxRelatedProducts());
+    }
 }

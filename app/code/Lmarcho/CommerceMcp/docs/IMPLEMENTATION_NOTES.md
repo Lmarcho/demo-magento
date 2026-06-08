@@ -111,3 +111,25 @@
   availability, and child media. Its configurable children have equal prices,
   so ranged configurable pricing is implemented through Magento's pricing
   model but could not be live-verified against a varied-price fixture.
+
+## Phase M5 decisions
+
+- `search_products_live` accepts a store code, optional text query, optional
+  candidate SKU list, requested sections, and bounded result/media/variant
+  limits. At least a query or candidate SKU list is required.
+- Candidate-SKU filtering is handled first when candidates are supplied. It
+  preserves the candidate order and filters against public, enabled,
+  storefront-visible products. When a query is also supplied, SKU and name are
+  matched in memory after the bounded candidate collection is loaded.
+- Native search fallback uses Magento catalog search fulltext collections and
+  applies the same enabled and storefront-visible filters.
+- Search result products are hydrated through `ProductHydrator`, so product
+  URL, media, price, availability, and variant behavior remain identical to
+  `get_products_live`.
+- `get_related_products` accepts related, upsell, and cross-sell link types.
+  When link types are omitted, all three groups are returned.
+- Related product collections use Magento link APIs, preserve link position
+  ordering where Magento exposes it, enforce a per-link-type limit, and hydrate
+  linked products through `ProductHydrator`.
+- Related product hydration is intentionally non-recursive; linked products do
+  not include their own related-product groups.

@@ -4,7 +4,7 @@ Magento-native, authenticated, read-only MCP server for live commerce data.
 
 ## Current status
 
-Phases M1 through M4 are implemented:
+Phases M1 through M5 are implemented:
 
 - `POST /commerce-mcp`
 - JSON-RPC 2.0
@@ -32,8 +32,13 @@ Phases M1 through M4 are implemented:
 - Configurable child image fallback to the parent, controlled by configuration
 - Optional `variants` section and variant limit in `get_products_live`
 - Executable `get_product_variants` for configurable and simple products
+- Candidate-SKU filtered product search
+- Magento native storefront search fallback
+- Executable `search_products_live` with normalized product hydration
+- Related, upsell, and cross-sell product link resolution
+- Executable `get_related_products` with per-link limits and link positions
 
-The remaining four commerce tool handlers are intentionally unavailable until
+The remaining two commerce tool handlers are intentionally unavailable until
 their implementation phase is completed.
 
 ## Installation
