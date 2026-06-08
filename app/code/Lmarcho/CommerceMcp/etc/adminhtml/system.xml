@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <tab id="lmarcho" translate="label" sortOrder="900">
+            <label>Lmarcho</label>
+        </tab>
+        <section id="commerce_mcp" translate="label" sortOrder="20"
+                 showInDefault="1" showInWebsite="0" showInStore="0">
+            <label>Commerce MCP</label>
+            <tab>lmarcho</tab>
+            <resource>Lmarcho_CommerceMcp::config</resource>
+            <group id="general" translate="label" sortOrder="10"
+                   showInDefault="1" showInWebsite="0" showInStore="0">
+                <label>General</label>
+                <field id="enabled" translate="label comment" type="select" sortOrder="10"
+                       showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Enable MCP Endpoint</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="max_request_bytes" translate="label comment" type="text" sortOrder="20"
+                       showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Maximum Request Size (bytes)</label>
+                    <validate>validate-digits validate-greater-than-zero</validate>
+                </field>
+                <field id="max_response_bytes" translate="label comment" type="text" sortOrder="30"
+                       showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Maximum Response Size (bytes)</label>
+                    <validate>validate-digits validate-greater-than-zero</validate>
+                </field>
+                <field id="allowed_store_codes" translate="label comment" type="text" sortOrder="40"
+                       showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Allowed Store Codes</label>
+                    <comment>Comma-separated active storefront codes. The admin store is never allowed.</comment>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

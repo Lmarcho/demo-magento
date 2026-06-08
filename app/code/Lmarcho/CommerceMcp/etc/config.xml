@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <commerce_mcp>
+            <general>
+                <enabled>1</enabled>
+                <max_request_bytes>1048576</max_request_bytes>
+                <max_response_bytes>2097152</max_response_bytes>
+                <allowed_store_codes>default</allowed_store_codes>
+            </general>
+        </commerce_mcp>
+    </default>
+</config>

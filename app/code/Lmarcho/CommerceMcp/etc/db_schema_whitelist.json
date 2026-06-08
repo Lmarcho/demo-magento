@@ -1,0 +1,56 @@
+{
+    "lmarcho_commerce_mcp_role": {
+        "column": {
+            "role_id": true,
+            "name": true,
+            "created_at": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "LMARCHO_COMMERCE_MCP_ROLE_NAME": true
+        }
+    },
+    "lmarcho_commerce_mcp_role_tool": {
+        "column": {
+            "role_tool_id": true,
+            "role_id": true,
+            "tool_name": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "FK_CED7CF97BC78DFD26397A10D1AA030A1": true,
+            "LMARCHO_COMMERCE_MCP_ROLE_TOOL_ROLE_ID_TOOL_NAME": true
+        }
+    },
+    "lmarcho_commerce_mcp_client": {
+        "column": {
+            "client_id": true,
+            "name": true,
+            "role_id": true,
+            "is_active": true,
+            "created_at": true,
+            "updated_at": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "LMARCHO_COMMERCE_MCP_CLIENT_NAME": true,
+            "FK_D3CCFADF12E54D7FD4731B0092EA3B27": true
+        }
+    },
+    "lmarcho_commerce_mcp_access_token": {
+        "column": {
+            "token_id": true,
+            "client_id": true,
+            "token_hash": true,
+            "expires_at": true,
+            "last_used_at": true,
+            "revoked_at": true,
+            "created_at": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "LMARCHO_COMMERCE_MCP_ACCESS_TOKEN_TOKEN_HASH": true,
+            "FK_950373106588A4EB4FFB7E92AC48B5B7": true
+        }
+    }
+}

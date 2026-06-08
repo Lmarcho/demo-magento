@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="Lmarcho\CommerceMcp\Api\AuthenticationServiceInterface"
+                type="Lmarcho\CommerceMcp\Model\Authentication\AuthenticationService"/>
+    <preference for="Lmarcho\CommerceMcp\Api\StoreContextResolverInterface"
+                type="Lmarcho\CommerceMcp\Model\Store\StoreContextResolver"/>
+
+    <type name="Lmarcho\CommerceMcp\Model\Mcp\ToolRegistry">
+        <arguments>
+            <argument name="implementedTools" xsi:type="array">
+                <item name="get_store_context"
+                      xsi:type="object">Lmarcho\CommerceMcp\Model\Tool\GetStoreContext</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <virtualType name="Lmarcho\CommerceMcp\Logger" type="Magento\Framework\Logger\Monolog">
+        <arguments>
+            <argument name="name" xsi:type="string">commerce_mcp</argument>
+            <argument name="handlers" xsi:type="array">
+                <item name="system" xsi:type="object">Lmarcho\CommerceMcp\LoggerHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="Lmarcho\CommerceMcp\LoggerHandler"
+                 type="Magento\Framework\Logger\Handler\Base">
+        <arguments>
+            <argument name="fileName" xsi:type="string">/var/log/commerce-mcp.log</argument>
+        </arguments>
+    </virtualType>
+
+    <type name="Lmarcho\CommerceMcp\Controller\Index\Index">
+        <arguments>
+            <argument name="logger" xsi:type="object">Lmarcho\CommerceMcp\Logger</argument>
+        </arguments>
+    </type>
+    <type name="Lmarcho\CommerceMcp\Model\Mcp\Server">
+        <arguments>
+            <argument name="logger" xsi:type="object">Lmarcho\CommerceMcp\Logger</argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\Framework\Console\CommandList">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="commerce_mcp_client_create"
+                      xsi:type="object">Lmarcho\CommerceMcp\Console\Command\CreateClientCommand</item>
+                <item name="commerce_mcp_token_rotate"
+                      xsi:type="object">Lmarcho\CommerceMcp\Console\Command\RotateTokenCommand</item>
+                <item name="commerce_mcp_client_revoke"
+                      xsi:type="object">Lmarcho\CommerceMcp\Console\Command\RevokeClientCommand</item>
+                <item name="commerce_mcp_tools_list"
+                      xsi:type="object">Lmarcho\CommerceMcp\Console\Command\ListToolsCommand</item>
+            </argument>
+        </arguments>
+    </type>
+</config>
