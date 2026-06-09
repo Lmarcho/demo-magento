@@ -8,6 +8,7 @@ use Lmarcho\CommerceMcp\Service\RateLimiter;
 use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\Filesystem;
 use Magento\Framework\Filesystem\Directory\WriteInterface;
+use Magento\Framework\Lock\LockManagerInterface;
 use PHPUnit\Framework\TestCase;
 
 class RateLimiterTest extends TestCase
@@ -35,11 +36,27 @@ class RateLimiterTest extends TestCase
         $filesystem->method('getDirectoryWrite')
             ->with(DirectoryList::VAR_DIR)
             ->willReturn($directory);
+        $lockManager = $this->createMock(LockManagerInterface::class);
+        $lockManager->method('lock')->willReturn(true);
+        $lockManager->expects(self::exactly(3))->method('unlock');
 
-        $limiter = new RateLimiter($filesystem);
+        $limiter = new RateLimiter($filesystem, $lockManager);
 
         self::assertTrue($limiter->isAllowed('client:1', 2));
         self::assertTrue($limiter->isAllowed('client:1', 2));
+        self::assertFalse($limiter->isAllowed('client:1', 2));
+    }
+
+    public function testRejectsWhenLockCannotBeAcquired(): void
+    {
+        $filesystem = $this->createMock(Filesystem::class);
+        $filesystem->expects(self::never())->method('getDirectoryWrite');
+        $lockManager = $this->createMock(LockManagerInterface::class);
+        $lockManager->method('lock')->willReturn(false);
+        $lockManager->expects(self::never())->method('unlock');
+
+        $limiter = new RateLimiter($filesystem, $lockManager);
+
         self::assertFalse($limiter->isAllowed('client:1', 2));
     }
 }

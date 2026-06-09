@@ -105,6 +105,8 @@ class Index implements HttpPostActionInterface, CsrfAwareActionInterface
             return $this->rawFactory->create()
                 ->setHttpResponseCode(202)
                 ->setHeader('X-Correlation-ID', $correlationId)
+                ->setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0', true)
+                ->setHeader('Pragma', 'no-cache', true)
                 ->setContents('');
         }
 
@@ -132,6 +134,8 @@ class Index implements HttpPostActionInterface, CsrfAwareActionInterface
         return $this->jsonFactory->create()
             ->setHttpResponseCode($status)
             ->setHeader('X-Correlation-ID', $correlationId)
+            ->setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0', true)
+            ->setHeader('Pragma', 'no-cache', true)
             ->setData($data);
     }
 

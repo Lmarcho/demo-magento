@@ -55,6 +55,8 @@ class Assertion implements HttpPostActionInterface
     {
         return $this->jsonFactory->create()
             ->setHttpResponseCode($status)
+            ->setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0', true)
+            ->setHeader('Pragma', 'no-cache', true)
             ->setData($data);
     }
 }
