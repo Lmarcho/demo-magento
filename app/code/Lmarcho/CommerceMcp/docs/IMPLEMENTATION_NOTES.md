@@ -41,8 +41,8 @@
 - The server is stateless and does not issue an MCP session ID.
 - Only `2025-11-25` is accepted initially. Older revisions can be added only
   after a tested client requirement is documented.
-- Exactly seven approved tool names are discoverable. Tool calls fail closed
-  until their implementation phase is complete.
+- Only approved tool names are discoverable. Tool calls fail closed when the
+  name is unknown, not allowed for the client role, or not implemented.
 - Authentication is required before deployment; the protocol classes are kept
   independent so they can be unit tested without Magento database fixtures.
 
@@ -208,3 +208,27 @@
   discovery, representative successful calls for every implemented tool, partial
   product errors, promotion coupon privacy, and owned/missing/unauthorized order
   status behavior.
+
+## Customer context extension decisions
+
+- `get_category_products` is public storefront data. It accepts a store code,
+  category ID, optional product sections, and bounded limits, then hydrates
+  enabled storefront-visible products through the existing product serializer.
+- `get_customer_cart` requires the same Magento-issued customer assertion as
+  `get_order_status`. It reads only the asserted customer's active quote for the
+  asserted store and returns visible item SKU/name/quantity plus bounded product
+  hydration. Each item includes `sku` for the actual cart item and `product_sku`
+  for the storefront-visible product used for hydration, which can be the
+  configurable parent for non-visible child variant SKUs. It does not expose
+  quote IDs, addresses, email, shipping methods, payment data, or customer
+  profile data.
+- `get_customer_purchase_history` requires a customer assertion and returns
+  product-level history only: SKU, item name, total quantity, order count, and
+  last purchase timestamp. `sku` is the actual purchased SKU and `product_sku`
+  is the visible product SKU used for product hydration. It intentionally omits
+  order numbers, addresses, email, payment data, totals, invoices, credit memos,
+  and raw order payloads.
+- Purchase-history output is intended for safe personalization. A client can use
+  `product_sku` values with `get_related_products` or `search_products_live` to
+  recommend complementary products without receiving broad customer/order
+  access.

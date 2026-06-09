@@ -13,6 +13,8 @@
                 type="Lmarcho\CommerceMcp\Model\Product\ProductVariantService"/>
     <preference for="Lmarcho\CommerceMcp\Api\ProductSearchServiceInterface"
                 type="Lmarcho\CommerceMcp\Model\Product\ProductSearchService"/>
+    <preference for="Lmarcho\CommerceMcp\Api\CategoryProductServiceInterface"
+                type="Lmarcho\CommerceMcp\Model\Product\CategoryProductService"/>
     <preference for="Lmarcho\CommerceMcp\Api\RelatedProductServiceInterface"
                 type="Lmarcho\CommerceMcp\Model\Product\RelatedProductService"/>
     <preference for="Lmarcho\CommerceMcp\Api\PromotionServiceInterface"
@@ -21,6 +23,10 @@
                 type="Lmarcho\CommerceMcp\Model\Authentication\CustomerAssertionService"/>
     <preference for="Lmarcho\CommerceMcp\Api\OrderStatusServiceInterface"
                 type="Lmarcho\CommerceMcp\Model\Order\OrderStatusService"/>
+    <preference for="Lmarcho\CommerceMcp\Api\CustomerCartServiceInterface"
+                type="Lmarcho\CommerceMcp\Model\Customer\CustomerCartService"/>
+    <preference for="Lmarcho\CommerceMcp\Api\CustomerPurchaseHistoryServiceInterface"
+                type="Lmarcho\CommerceMcp\Model\Customer\CustomerPurchaseHistoryService"/>
 
     <type name="Lmarcho\CommerceMcp\Model\Mcp\ToolRegistry">
         <arguments>
@@ -31,6 +37,8 @@
                       xsi:type="object">Lmarcho\CommerceMcp\Model\Tool\GetProductsLive</item>
                 <item name="search_products_live"
                       xsi:type="object">Lmarcho\CommerceMcp\Model\Tool\SearchProductsLive</item>
+                <item name="get_category_products"
+                      xsi:type="object">Lmarcho\CommerceMcp\Model\Tool\GetCategoryProducts</item>
                 <item name="get_product_variants"
                       xsi:type="object">Lmarcho\CommerceMcp\Model\Tool\GetProductVariants</item>
                 <item name="get_related_products"
@@ -39,6 +47,10 @@
                       xsi:type="object">Lmarcho\CommerceMcp\Model\Tool\GetActivePromotions</item>
                 <item name="get_order_status"
                       xsi:type="object">Lmarcho\CommerceMcp\Model\Tool\GetOrderStatus</item>
+                <item name="get_customer_cart"
+                      xsi:type="object">Lmarcho\CommerceMcp\Model\Tool\GetCustomerCart</item>
+                <item name="get_customer_purchase_history"
+                      xsi:type="object">Lmarcho\CommerceMcp\Model\Tool\GetCustomerPurchaseHistory</item>
             </argument>
         </arguments>
     </type>

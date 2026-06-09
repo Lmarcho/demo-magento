@@ -15,10 +15,13 @@ class ToolRegistryTest extends TestCase
             'get_store_context',
             'get_products_live',
             'search_products_live',
+            'get_category_products',
             'get_product_variants',
             'get_related_products',
             'get_active_promotions',
             'get_order_status',
+            'get_customer_cart',
+            'get_customer_purchase_history',
         ], (new ToolRegistry())->names());
     }
 

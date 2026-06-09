@@ -12,7 +12,7 @@ Phases M1 through M8 are implemented:
 - `initialize`, `notifications/initialized`, `ping`, `tools/list`, and
   fail-closed `tools/call`
 - Hashed bearer tokens for named clients
-- Explicit read-only role containing only the seven approved tools
+- Explicit read-only role containing only approved tools
 - Token creation, rotation, and revocation
 - Request/response size limits and correlation IDs
 - Store-code allow-listing
@@ -35,6 +35,7 @@ Phases M1 through M8 are implemented:
 - Candidate-SKU filtered product search
 - Magento native storefront search fallback
 - Executable `search_products_live` with normalized product hydration
+- Category-scoped public product browsing through `get_category_products`
 - Related, upsell, and cross-sell product link resolution
 - Executable `get_related_products` with per-link limits and link positions
 - Public active catalog-rule and cart-rule summaries
@@ -44,11 +45,17 @@ Phases M1 through M8 are implemented:
 - Customer-owned order status serialization without addresses, email, payment,
   invoices, credit memos, or internal comments
 - Executable `get_order_status` with customer assertion proof
+- Customer-owned active cart reading through `get_customer_cart`, with actual
+  item SKU plus visible `product_sku` for storefront hydration
+- Customer-owned product-level purchase history through
+  `get_customer_purchase_history`, without order numbers, addresses, email, or
+  payment data; hidden child variant SKUs map to their visible parent
+  `product_sku` where possible
 - Per-client and order-status-specific rate limiting
 - Sanitized MCP request/response logging and timing metadata
 - Configured HTTPS tracking URL templates by carrier code
 
-All seven approved commerce tool handlers are implemented.
+Ten approved commerce tool handlers are implemented.
 
 ## Installation
 

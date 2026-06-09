@@ -61,6 +61,7 @@ class ClientManager
 
         $connection->beginTransaction();
         try {
+            $this->ensureReadOnlyRole();
             $connection->update(
                 $tokenTable,
                 ['revoked_at' => gmdate('Y-m-d H:i:s')],

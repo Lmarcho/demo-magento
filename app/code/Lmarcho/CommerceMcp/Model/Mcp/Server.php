@@ -90,9 +90,9 @@ class Server
             ],
             'serverInfo' => [
                 'name' => 'Lmarcho Commerce MCP',
-                'version' => '0.8.0',
+                'version' => '0.9.0',
             ],
-            'instructions' => 'Read-only public commerce tools. Order status requires customer proof.',
+            'instructions' => 'Read-only commerce tools. Customer cart, purchase history, and order status require customer proof.',
         ];
     }
 
