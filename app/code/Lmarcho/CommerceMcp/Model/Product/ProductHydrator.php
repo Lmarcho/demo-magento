@@ -9,10 +9,13 @@ use Lmarcho\CommerceMcp\Api\ProductVariantResolverInterface;
 use Lmarcho\CommerceMcp\Api\StoreContextResolverInterface;
 use Lmarcho\CommerceMcp\Exception\JsonRpcException;
 use Lmarcho\CommerceMcp\Model\Config;
+use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\Product\Attribute\Source\Status;
 use Magento\Catalog\Model\Product\Visibility;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
+use Magento\Framework\App\ObjectManager;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Store\Model\StoreManagerInterface;
 
 class ProductHydrator implements ProductHydratorInterface
@@ -34,7 +37,8 @@ class ProductHydrator implements ProductHydratorInterface
         private readonly PriceResolver $priceResolver,
         private readonly MediaResolver $mediaResolver,
         private readonly AvailabilityResolver $availabilityResolver,
-        private readonly ProductVariantResolverInterface $variantResolver
+        private readonly ProductVariantResolverInterface $variantResolver,
+        private readonly ?ProductRepositoryInterface $productRepository = null
     ) {
     }
 
@@ -103,6 +107,7 @@ class ProductHydrator implements ProductHydratorInterface
             foreach ($collection as $product) {
                 $loaded[$product->getSku()] = $product;
             }
+            $loaded = $this->loadMissingVisibleProducts($skus, $loaded, $context->getStoreId());
             $availability = in_array('availability', $sections, true)
                 ? $this->availabilityResolver->resolve(array_keys($loaded), $context->getStockId())
                 : [];
@@ -142,6 +147,57 @@ class ProductHydrator implements ProductHydratorInterface
         } finally {
             $this->storeManager->setCurrentStore($originalStoreId);
         }
+    }
+
+    /**
+     * Product collections in a storefront area can hide out-of-stock products
+     * when Magento's "Display Out of Stock Products" setting is disabled. Direct
+     * SKU hydration still needs enabled and visible products so availability can
+     * truthfully return OUT_OF_STOCK instead of PRODUCT_NOT_AVAILABLE.
+     *
+     * @param string[] $skus
+     * @param array<string,Product> $loaded
+     * @return array<string,Product>
+     */
+    private function loadMissingVisibleProducts(array $skus, array $loaded, int $storeId): array
+    {
+        foreach ($skus as $sku) {
+            if (isset($loaded[$sku])) {
+                continue;
+            }
+
+            try {
+                $product = $this->productRepository()->get($sku, false, $storeId, true);
+            } catch (NoSuchEntityException) {
+                continue;
+            } catch (\Throwable) {
+                continue;
+            }
+
+            if (!$this->isPubliclyVisible($product)) {
+                continue;
+            }
+
+            $loaded[(string)$product->getSku()] = $product;
+        }
+
+        return $loaded;
+    }
+
+    private function productRepository(): ProductRepositoryInterface
+    {
+        return $this->productRepository
+            ?? ObjectManager::getInstance()->get(ProductRepositoryInterface::class);
+    }
+
+    private function isPubliclyVisible(Product $product): bool
+    {
+        return (int)$product->getStatus() === Status::STATUS_ENABLED
+            && in_array((int)$product->getVisibility(), [
+                Visibility::VISIBILITY_IN_CATALOG,
+                Visibility::VISIBILITY_IN_SEARCH,
+                Visibility::VISIBILITY_BOTH,
+            ], true);
     }
 
     /**
