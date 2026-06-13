@@ -34,12 +34,12 @@ $chatSession = $viewModel->getChatSessionJson();
     var customerContext = <?= /* @noEscape */ $customerContext ?>;
     var chatSession = <?= /* @noEscape */ $chatSession ?>;
 
-    // Daily cache key: caches the bundle across page views (the asset is served
-    // immutable/gzipped) while still picking up a new build within a day. The old
-    // Date.now() buster forced a full re-download on every page load.
+    // Short cache key: the backend widget changes independently of the Magento
+    // module, so daily cache busting can leave storefronts on an old renderer
+    // after a SaaS-side deploy.
     var versionedSrc = scriptUrl
         + (scriptUrl.indexOf('?') === -1 ? '?' : '&')
-        + 'v=' + Math.floor(Date.now() / 86400000);
+        + 'v=' + Math.floor(Date.now() / 60000);
 
     // Warm the cross-origin connection and prefetch the bundle early, so the chat
     // button shows quickly even on heavy storefront pages (the async script would
