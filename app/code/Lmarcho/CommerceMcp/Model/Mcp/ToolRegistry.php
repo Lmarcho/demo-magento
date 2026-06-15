@@ -16,6 +16,7 @@ class ToolRegistry
         'get_product_variants' => 'Return bounded configurable-product variant data.',
         'get_related_products' => 'Return related, upsell, or cross-sell products.',
         'get_active_promotions' => 'Return public active promotion summaries.',
+        'get_product_popularity' => 'Return aggregate product purchase counts for ranking.',
         'get_order_status' => 'Return a customer-owned order status using a Magento assertion.',
         'get_customer_cart' => 'Return the asserted customer active cart.',
         'get_customer_purchase_history' => 'Return asserted customer product-level purchase history.',

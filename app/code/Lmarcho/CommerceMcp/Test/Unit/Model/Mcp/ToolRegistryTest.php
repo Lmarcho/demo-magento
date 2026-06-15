@@ -19,6 +19,7 @@ class ToolRegistryTest extends TestCase
             'get_product_variants',
             'get_related_products',
             'get_active_promotions',
+            'get_product_popularity',
             'get_order_status',
             'get_customer_cart',
             'get_customer_purchase_history',

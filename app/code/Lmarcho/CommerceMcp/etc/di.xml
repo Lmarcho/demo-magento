@@ -13,6 +13,8 @@
                 type="Lmarcho\CommerceMcp\Model\Product\ProductVariantService"/>
     <preference for="Lmarcho\CommerceMcp\Api\ProductSearchServiceInterface"
                 type="Lmarcho\CommerceMcp\Model\Product\ProductSearchService"/>
+    <preference for="Lmarcho\CommerceMcp\Api\ProductPopularityServiceInterface"
+                type="Lmarcho\CommerceMcp\Model\Product\ProductPopularityService"/>
     <preference for="Lmarcho\CommerceMcp\Api\CategoryProductServiceInterface"
                 type="Lmarcho\CommerceMcp\Model\Product\CategoryProductService"/>
     <preference for="Lmarcho\CommerceMcp\Api\RelatedProductServiceInterface"
@@ -45,6 +47,8 @@
                       xsi:type="object">Lmarcho\CommerceMcp\Model\Tool\GetRelatedProducts</item>
                 <item name="get_active_promotions"
                       xsi:type="object">Lmarcho\CommerceMcp\Model\Tool\GetActivePromotions</item>
+                <item name="get_product_popularity"
+                      xsi:type="object">Lmarcho\CommerceMcp\Model\Tool\GetProductPopularity</item>
                 <item name="get_order_status"
                       xsi:type="object">Lmarcho\CommerceMcp\Model\Tool\GetOrderStatus</item>
                 <item name="get_customer_cart"
