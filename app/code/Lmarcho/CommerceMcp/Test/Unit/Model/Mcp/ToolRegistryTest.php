@@ -21,6 +21,7 @@ class ToolRegistryTest extends TestCase
             'get_active_promotions',
             'get_product_popularity',
             'get_order_status',
+            'verify_guest_order',
             'get_customer_cart',
             'get_customer_purchase_history',
         ], (new ToolRegistry())->names());

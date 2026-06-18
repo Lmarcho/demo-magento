@@ -114,7 +114,7 @@ class Server
             ]);
             throw new JsonRpcException('Access denied', -32003, $request['id']);
         }
-        if ($name === 'get_order_status'
+        if (in_array($name, ['get_order_status', 'verify_guest_order'], true)
             && $clientId !== null
             && !$this->rateLimiter->isAllowed(
                 'order_status:' . $clientId,
@@ -155,6 +155,7 @@ class Server
                 'store_code' => $this->safeString($arguments['store_code'] ?? null),
                 'sku_count' => $this->countList($arguments['skus'] ?? null),
                 'has_customer_assertion' => isset($arguments['customer_assertion']),
+                'has_guest_contact' => isset($arguments['contact']),
                 'duration_ms' => round((microtime(true) - $started) * 1000, 2),
             ]);
         }

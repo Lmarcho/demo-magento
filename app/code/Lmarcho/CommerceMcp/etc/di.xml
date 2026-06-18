@@ -51,6 +51,8 @@
                       xsi:type="object">Lmarcho\CommerceMcp\Model\Tool\GetProductPopularity</item>
                 <item name="get_order_status"
                       xsi:type="object">Lmarcho\CommerceMcp\Model\Tool\GetOrderStatus</item>
+                <item name="verify_guest_order"
+                      xsi:type="object">Lmarcho\CommerceMcp\Model\Tool\VerifyGuestOrder</item>
                 <item name="get_customer_cart"
                       xsi:type="object">Lmarcho\CommerceMcp\Model\Tool\GetCustomerCart</item>
                 <item name="get_customer_purchase_history"

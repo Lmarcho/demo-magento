@@ -45,6 +45,8 @@ Phases M1 through M8 are implemented:
 - Customer-owned order status serialization without addresses, email, payment,
   invoices, credit memos, or internal comments
 - Executable `get_order_status` with customer assertion proof
+- Limited guest order status through `verify_guest_order` when order number
+  matches the billing email or phone
 - Customer-owned active cart reading through `get_customer_cart`, with actual
   item SKU plus visible `product_sku` for storefront hydration
 - Customer-owned product-level purchase history through
@@ -55,7 +57,7 @@ Phases M1 through M8 are implemented:
 - Sanitized MCP request/response logging and timing metadata
 - Configured HTTPS tracking URL templates by carrier code
 
-Ten approved commerce tool handlers are implemented.
+Twelve approved commerce tool handlers are implemented.
 
 ## Installation
 

@@ -187,13 +187,20 @@
   the carrier code. The serializer does not return addresses, email, phone,
   payment data, internal comments, invoices, credit memos, fraud/risk data, or
   raw order payloads.
+- `verify_guest_order` is the lower-security guest checkout path. It requires
+  store code, order number, and the billing email or phone used on the order.
+  Missing and mismatched orders return the same `ORDER_NOT_ACCESSIBLE` public
+  error. The guest serializer is intentionally smaller: order number, status,
+  placed date, currency, grand total, visible item count, and shipping method
+  summary only.
 
 ## Phase M8 decisions
 
 - Authenticated MCP calls are rate limited per client with a fixed one-minute
   file-backed bucket under Magento `var/commerce_mcp/rate_limit`.
-- `get_order_status` has an additional, stricter per-client bucket controlled
-  by `commerce_mcp/general/order_status_rate_limit_per_minute`.
+- `get_order_status` and `verify_guest_order` share an additional, stricter
+  per-client bucket controlled by
+  `commerce_mcp/general/order_status_rate_limit_per_minute`.
 - Logs include correlation ID, client ID, tool name, store code, SKU count,
   customer-assertion presence, duration, response byte size, access denial, and
   rate-limit events.

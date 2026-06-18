@@ -18,6 +18,7 @@ class ToolRegistry
         'get_active_promotions' => 'Return public active promotion summaries.',
         'get_product_popularity' => 'Return aggregate product purchase counts for ranking.',
         'get_order_status' => 'Return a customer-owned order status using a Magento assertion.',
+        'verify_guest_order' => 'Verify a guest order using order number plus billing email or phone.',
         'get_customer_cart' => 'Return the asserted customer active cart.',
         'get_customer_purchase_history' => 'Return asserted customer product-level purchase history.',
     ];
