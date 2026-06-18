@@ -22,6 +22,8 @@ $apiBaseUrl = $viewModel->getApiBaseUrl();
 $apiKey = $viewModel->getApiKey();
 $customerContext = $viewModel->getCustomerContextJson();
 $chatSession = $viewModel->getChatSessionJson();
+$customerAssertionEndpoint = $viewModel->getCustomerAssertionEndpoint();
+$customerAssertionFormKey = $viewModel->getCustomerAssertionFormKey();
 ?>
 <script>
 (function() {
@@ -33,6 +35,8 @@ $chatSession = $viewModel->getChatSessionJson();
     var apiKey = <?= /* @noEscape */ json_encode($apiKey) ?>;
     var customerContext = <?= /* @noEscape */ $customerContext ?>;
     var chatSession = <?= /* @noEscape */ $chatSession ?>;
+    var customerAssertionEndpoint = <?= /* @noEscape */ json_encode($customerAssertionEndpoint) ?>;
+    var customerAssertionFormKey = <?= /* @noEscape */ json_encode($customerAssertionFormKey) ?>;
 
     // Short cache key: the backend widget changes independently of the Magento
     // module, so daily cache busting can leave storefronts on an old renderer
@@ -90,6 +94,8 @@ $chatSession = $viewModel->getChatSessionJson();
                     apiKey: apiKey,
                     customer: customerContext,
                     session: chatSession,
+                    customerAssertionEndpoint: customerAssertionEndpoint,
+                    customerAssertionFormKey: customerAssertionFormKey,
                     skipRemoteConfig: true, // Config already fetched above
                     debug: false
                 });

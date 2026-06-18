@@ -9,9 +9,11 @@ namespace Lmarcho\RagSync\ViewModel;
 
 use Magento\Framework\View\Element\Block\ArgumentInterface;
 use Magento\Framework\View\LayoutInterface;
+use Magento\Framework\Data\Form\FormKey;
 use Magento\Framework\Stdlib\CookieManagerInterface;
 use Magento\Framework\Stdlib\Cookie\CookieMetadataFactory;
 use Magento\Framework\Session\SessionManagerInterface;
+use Magento\Framework\UrlInterface;
 use Magento\Customer\Model\Session as CustomerSession;
 use Magento\Store\Model\StoreManagerInterface;
 use Lmarcho\RagSync\Model\Config;
@@ -57,6 +59,16 @@ class WidgetConfig implements ArgumentInterface
     private SessionManagerInterface $sessionManager;
 
     /**
+     * @var FormKey
+     */
+    private FormKey $formKey;
+
+    /**
+     * @var UrlInterface
+     */
+    private UrlInterface $urlBuilder;
+
+    /**
      * @var string|null
      */
     private ?string $chatSessionId = null;
@@ -77,7 +89,9 @@ class WidgetConfig implements ArgumentInterface
         StoreManagerInterface $storeManager,
         CookieManagerInterface $cookieManager,
         CookieMetadataFactory $cookieMetadataFactory,
-        SessionManagerInterface $sessionManager
+        SessionManagerInterface $sessionManager,
+        FormKey $formKey,
+        UrlInterface $urlBuilder
     ) {
         $this->config = $config;
         $this->layout = $layout;
@@ -86,6 +100,8 @@ class WidgetConfig implements ArgumentInterface
         $this->cookieManager = $cookieManager;
         $this->cookieMetadataFactory = $cookieMetadataFactory;
         $this->sessionManager = $sessionManager;
+        $this->formKey = $formKey;
+        $this->urlBuilder = $urlBuilder;
     }
 
     /**
@@ -182,6 +198,36 @@ class WidgetConfig implements ArgumentInterface
     public function getApiKey(): string
     {
         return $this->config->getWidgetApiKey($this->getStoreId());
+    }
+
+    /**
+     * Get same-origin customer assertion endpoint for secure order-status chat.
+     *
+     * @return string
+     */
+    public function getCustomerAssertionEndpoint(): string
+    {
+        try {
+            return $this->urlBuilder->getUrl('commerce-mcp/customer/assertion', [
+                '_secure' => $this->isSecure(),
+            ]);
+        } catch (\Exception $e) {
+            return '';
+        }
+    }
+
+    /**
+     * Get Magento form key required by the assertion endpoint.
+     *
+     * @return string
+     */
+    public function getCustomerAssertionFormKey(): string
+    {
+        try {
+            return $this->formKey->getFormKey();
+        } catch (\Exception $e) {
+            return '';
+        }
     }
 
     /**
