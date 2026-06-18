@@ -1,9 +1,22 @@
 {
     "name": "lmarcho/module-commerce-mcp",
-    "description": "Authenticated, read-only commerce MCP server for Magento 2.",
+    "description": "Authenticated, read-only commerce MCP server for Magento 2 and AskRAG.",
     "type": "magento2-module",
     "version": "0.9.0",
     "license": "proprietary",
+    "keywords": [
+        "magento2",
+        "commerce",
+        "mcp",
+        "chatbot",
+        "rag"
+    ],
+    "authors": [
+        {
+            "name": "AskRAG",
+            "homepage": "https://askrag.app"
+        }
+    ],
     "require": {
         "php": "~8.1.0 || ~8.2.0 || ~8.3.0",
         "magento/framework": ">=103.0 <104",

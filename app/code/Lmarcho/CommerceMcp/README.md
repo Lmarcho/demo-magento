@@ -61,7 +61,14 @@ Twelve approved commerce tool handlers are implemented.
 
 ## Installation
 
+Composer package name:
+
+```text
+lmarcho/module-commerce-mcp
+```
+
 ```bash
+composer require lmarcho/module-commerce-mcp
 php bin/magento module:enable Lmarcho_CommerceMcp
 php bin/magento setup:upgrade
 php bin/magento cache:clean config full_page
@@ -101,6 +108,17 @@ List the approved registry:
 ```bash
 php bin/magento commerce-mcp:tools:list
 ```
+
+## Order Tools Setup
+
+See [docs/ORDER_TOOLS_SETUP.md](docs/ORDER_TOOLS_SETUP.md) for required module
+versions, `setup:upgrade`, health checks, and widget behavior for logged-in and
+guest order status.
+
+## Marketplace Preparation
+
+See [docs/MARKETPLACE_CHECKLIST.md](docs/MARKETPLACE_CHECKLIST.md) before
+packaging the module for Commerce Marketplace review.
 
 ## Example initialize request
 
