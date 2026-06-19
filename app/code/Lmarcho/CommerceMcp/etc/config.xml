@@ -4,7 +4,7 @@
     <default>
         <commerce_mcp>
             <general>
-                <enabled>1</enabled>
+                <enabled>0</enabled>
                 <max_request_bytes>1048576</max_request_bytes>
                 <max_response_bytes>2097152</max_response_bytes>
                 <allowed_store_codes>default</allowed_store_codes>

@@ -58,9 +58,11 @@ Before packaging:
    ```
 
 4. Create an MCP client token.
-5. Run the AskRAG MCP health check for a Magento tenant.
-6. Test product, promotion, popularity, logged-in order, and guest order tools.
-7. Confirm logs do not contain access tokens, customer assertions, full order
+5. Enable `commerce_mcp/general/enabled` after allowed store codes and the MCP
+   client are configured.
+6. Run the AskRAG MCP health check for a Magento tenant.
+7. Test product, promotion, popularity, logged-in order, and guest order tools.
+8. Confirm logs do not contain access tokens, customer assertions, full order
    numbers, billing email, phone, addresses, or payment data.
 
 ## Packaging

@@ -74,6 +74,15 @@ php bin/magento setup:upgrade
 php bin/magento cache:clean config full_page
 ```
 
+The MCP endpoint is disabled by default after installation. After configuring
+allowed store codes and creating an MCP client, enable it in Magento Admin under
+Stores > Configuration > Services > Commerce MCP > General, or run:
+
+```bash
+php bin/magento config:set commerce_mcp/general/enabled 1
+php bin/magento cache:clean config
+```
+
 Production deployments must also run:
 
 ```bash

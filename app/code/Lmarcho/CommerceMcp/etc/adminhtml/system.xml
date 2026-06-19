@@ -17,6 +17,7 @@
                        showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>Enable MCP Endpoint</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Disabled by default. Enable only after allowed store codes and MCP clients are configured.</comment>
                 </field>
                 <field id="max_request_bytes" translate="label comment" type="text" sortOrder="20"
                        showInDefault="1" showInWebsite="0" showInStore="0">
