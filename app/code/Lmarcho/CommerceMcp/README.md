@@ -127,7 +127,11 @@ guest order status.
 ## Marketplace Preparation
 
 See [docs/MARKETPLACE_CHECKLIST.md](docs/MARKETPLACE_CHECKLIST.md) before
-packaging the module for Commerce Marketplace review.
+packaging the module for Commerce Marketplace review. The customer-facing user
+guide for Marketplace manual QA is available at
+[docs/COMMERCE_MCP_USER_GUIDE.pdf](docs/COMMERCE_MCP_USER_GUIDE.pdf), with
+editable source at
+[docs/COMMERCE_MCP_USER_GUIDE.html](docs/COMMERCE_MCP_USER_GUIDE.html).
 
 ## Example initialize request
 

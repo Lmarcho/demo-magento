@@ -1,0 +1,481 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Lmarcho Commerce MCP User Guide</title>
+    <style>
+        @page {
+            margin: 18mm 16mm;
+        }
+
+        body {
+            color: #1f2933;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 12px;
+            line-height: 1.55;
+        }
+
+        h1 {
+            border-bottom: 2px solid #2563eb;
+            color: #111827;
+            font-size: 26px;
+            margin: 0 0 6px;
+            padding-bottom: 10px;
+        }
+
+        h2 {
+            color: #111827;
+            font-size: 18px;
+            margin: 24px 0 8px;
+        }
+
+        h3 {
+            color: #111827;
+            font-size: 14px;
+            margin: 16px 0 6px;
+        }
+
+        p {
+            margin: 6px 0 10px;
+        }
+
+        ul, ol {
+            margin: 6px 0 12px 22px;
+            padding: 0;
+        }
+
+        li {
+            margin: 4px 0;
+        }
+
+        code {
+            background: #f3f4f6;
+            border-radius: 3px;
+            color: #111827;
+            font-family: Consolas, Menlo, monospace;
+            font-size: 11px;
+            padding: 1px 4px;
+        }
+
+        pre {
+            background: #f8fafc;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            color: #111827;
+            font-family: Consolas, Menlo, monospace;
+            font-size: 10px;
+            line-height: 1.45;
+            margin: 8px 0 14px;
+            padding: 10px;
+            white-space: pre-wrap;
+        }
+
+        table {
+            border-collapse: collapse;
+            margin: 8px 0 14px;
+            width: 100%;
+        }
+
+        th, td {
+            border: 1px solid #d1d5db;
+            padding: 6px 7px;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        th {
+            background: #eef2ff;
+            color: #111827;
+            font-weight: bold;
+        }
+
+        .meta {
+            color: #4b5563;
+            font-size: 11px;
+            margin-bottom: 18px;
+        }
+
+        .note {
+            background: #eff6ff;
+            border-left: 4px solid #2563eb;
+            margin: 10px 0 14px;
+            padding: 8px 10px;
+        }
+
+        .warning {
+            background: #fff7ed;
+            border-left: 4px solid #f97316;
+            margin: 10px 0 14px;
+            padding: 8px 10px;
+        }
+
+        .page-break {
+            page-break-before: always;
+        }
+    </style>
+</head>
+<body>
+    <h1>Lmarcho Commerce MCP User Guide</h1>
+    <p class="meta">Module: <strong>Lmarcho_CommerceMcp</strong> &nbsp;|&nbsp; Version: <strong>0.9.0</strong> &nbsp;|&nbsp; Audience: Magento administrators and AskRAG integration operators</p>
+
+    <h2>1. Overview</h2>
+    <p>
+        Lmarcho Commerce MCP adds an authenticated, read-only Model Context Protocol
+        endpoint to Magento Open Source or Adobe Commerce. The endpoint allows an
+        approved AskRAG backend to fetch live storefront information such as product
+        prices, stock status, media, categories, promotions, and customer-authorized
+        order status.
+    </p>
+    <p>
+        The module does not create or edit products, carts, customers, orders,
+        coupons, or administrator records. It is designed for customer-facing chat
+        experiences where stable product and content knowledge is combined with live
+        commerce data from Magento.
+    </p>
+
+    <h2>2. Main Features</h2>
+    <ul>
+        <li>Authenticated MCP endpoint at <code>/commerce-mcp</code>.</li>
+        <li>Named client tokens that are shown once, stored hashed, rotated, and revoked.</li>
+        <li>Store-code allow-listing so each request is scoped to approved storefronts.</li>
+        <li>Live product hydration with public price, salability, URLs, images, gallery, attributes, options, and bounded variants.</li>
+        <li>Product search, category browsing, related products, upsells, and cross-sells.</li>
+        <li>Public promotion summaries with coupon disclosure controlled by an allow-list.</li>
+        <li>Aggregate product popularity for ranking general product suggestions.</li>
+        <li>Logged-in customer order status through short-lived Magento-issued assertions.</li>
+        <li>Guest order verification with order number plus billing email or phone.</li>
+        <li>Read-only cart and purchase-history summaries for asserted logged-in customers.</li>
+        <li>Request limits, response limits, rate limits, and sanitized correlation logging.</li>
+    </ul>
+
+    <h2>3. Requirements</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Requirement</th>
+                <th>Supported value</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Magento</td>
+                <td>Magento Open Source or Adobe Commerce using Magento framework <code>&gt;=103.0 &lt;104</code>.</td>
+            </tr>
+            <tr>
+                <td>PHP</td>
+                <td>8.1, 8.2, or 8.3.</td>
+            </tr>
+            <tr>
+                <td>Inventory</td>
+                <td>Magento Inventory Sales API for salability checks.</td>
+            </tr>
+            <tr>
+                <td>AskRAG backend</td>
+                <td>A tenant configuration that supports Magento MCP health checks, live data, and order verification.</td>
+            </tr>
+            <tr>
+                <td>Transport</td>
+                <td>HTTPS is expected for shared and production environments.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>4. Installation</h2>
+    <h3>Composer Installation</h3>
+    <pre>composer require lmarcho/module-commerce-mcp
+php bin/magento module:enable Lmarcho_CommerceMcp
+php bin/magento setup:upgrade
+php bin/magento cache:clean config full_page</pre>
+
+    <h3>Production Mode</h3>
+    <pre>php bin/magento setup:di:compile
+php bin/magento setup:static-content:deploy -f
+php bin/magento cache:clean</pre>
+
+    <div class="note">
+        The MCP endpoint is disabled by default after installation. Configure
+        allowed store codes and create an MCP client token before enabling it.
+    </div>
+
+    <h2>5. Magento Admin Configuration</h2>
+    <p>
+        Open <strong>Stores &gt; Configuration &gt; Services &gt; Commerce MCP</strong>.
+        The configuration is global because the MCP endpoint is intentionally scoped
+        by explicit store-code allow-listing.
+    </p>
+    <table>
+        <thead>
+            <tr>
+                <th>Field</th>
+                <th>Purpose</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Enable MCP Endpoint</td>
+                <td>Turns the endpoint on after setup is complete. Keep disabled until token and store-code configuration is ready.</td>
+            </tr>
+            <tr>
+                <td>Maximum Request Size</td>
+                <td>Rejects oversized MCP requests before tool execution.</td>
+            </tr>
+            <tr>
+                <td>Maximum Response Size</td>
+                <td>Prevents overly large tool responses.</td>
+            </tr>
+            <tr>
+                <td>Allowed Store Codes</td>
+                <td>Comma-separated active storefront codes, for example <code>default,en_us</code>. The admin store is never allowed.</td>
+            </tr>
+            <tr>
+                <td>Maximum SKUs Per Request</td>
+                <td>Limits batched product hydration.</td>
+            </tr>
+            <tr>
+                <td>Maximum Gallery Images Per Product</td>
+                <td>Bounds product media payloads.</td>
+            </tr>
+            <tr>
+                <td>Maximum Variants Per Product</td>
+                <td>Bounds configurable child variant data.</td>
+            </tr>
+            <tr>
+                <td>Fallback to Parent Variant Image</td>
+                <td>Uses parent media when a child variant has no image.</td>
+            </tr>
+            <tr>
+                <td>Maximum Search Results</td>
+                <td>Limits native search and category product responses.</td>
+            </tr>
+            <tr>
+                <td>Maximum Related Products Per Link Type</td>
+                <td>Limits related, upsell, and cross-sell responses.</td>
+            </tr>
+            <tr>
+                <td>Maximum Promotions Per Request</td>
+                <td>Limits public promotion summaries.</td>
+            </tr>
+            <tr>
+                <td>Public Chat Coupon Codes</td>
+                <td>Comma-separated coupon codes approved for chatbot display. Codes not listed here are hidden.</td>
+            </tr>
+            <tr>
+                <td>Customer Assertion Lifetime</td>
+                <td>Short-lived logged-in customer proof, clamped to 60 through 300 seconds.</td>
+            </tr>
+            <tr>
+                <td>Customer Assertion Signing Key</td>
+                <td>Optional dedicated HMAC secret. If empty, Magento's crypt key is used.</td>
+            </tr>
+            <tr>
+                <td>Request Rate Limit Per Minute</td>
+                <td>Per-client general MCP request limit.</td>
+            </tr>
+            <tr>
+                <td>Order Status Rate Limit Per Minute</td>
+                <td>Stricter order-status request limit.</td>
+            </tr>
+            <tr>
+                <td>Tracking URL Templates</td>
+                <td>Optional HTTPS carrier templates, one per line, for example <code>ups=https://carrier.example/track/{tracking_number}</code>.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>6. Access Token Setup</h2>
+    <p>
+        Tokens identify server-to-server MCP clients. Tokens are displayed only once
+        and are stored hashed in Magento. Store the token in the AskRAG tenant's
+        Magento integration settings.
+    </p>
+
+    <h3>Create a Client Token</h3>
+    <pre>php bin/magento commerce-mcp:client:create "AskRAG Laravel"</pre>
+    <p>Optional UTC expiry:</p>
+    <pre>php bin/magento commerce-mcp:client:create "AskRAG Laravel" --expires-at="2026-12-31 23:59:59"</pre>
+
+    <h3>Rotate or Revoke a Client</h3>
+    <pre>php bin/magento commerce-mcp:token:rotate "AskRAG Laravel"
+php bin/magento commerce-mcp:client:revoke "AskRAG Laravel"</pre>
+
+    <h3>List Available Tools</h3>
+    <pre>php bin/magento commerce-mcp:tools:list</pre>
+
+    <h2 class="page-break">7. AskRAG Tenant Configuration</h2>
+    <p>Configure the Magento integration in the AskRAG backend or tenant admin:</p>
+    <table>
+        <thead>
+            <tr>
+                <th>Setting</th>
+                <th>Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>MCP endpoint</td>
+                <td><code>https://STORE-DOMAIN/commerce-mcp</code></td>
+            </tr>
+            <tr>
+                <td>MCP token</td>
+                <td>The generated token beginning with <code>lmcp_</code>.</td>
+            </tr>
+            <tr>
+                <td>Store code</td>
+                <td>The configured Magento storefront code, usually <code>default</code>.</td>
+            </tr>
+            <tr>
+                <td>Driver mode</td>
+                <td>Use <code>shadow</code> during rollout, then <code>mcp</code> after verification.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>8. Health Check</h2>
+    <p>From the AskRAG backend, run:</p>
+    <pre>php artisan commerce:mcp:health TENANT_SLUG --platform=magento --json</pre>
+    <p>The health check should confirm:</p>
+    <ul>
+        <li>MCP initialization succeeds.</li>
+        <li>Required tools are present.</li>
+        <li>The configured store code resolves correctly.</li>
+        <li>Schema and protocol versions are supported.</li>
+        <li>Order tools are present when order status is enabled in the tenant workflow.</li>
+    </ul>
+
+    <h2>9. Customer-Facing Chat Behavior</h2>
+    <h3>Product and Category Questions</h3>
+    <p>
+        AskRAG may use vector retrieval to discover candidate products, then call
+        Magento MCP for current price, stock, media, product URLs, categories, and
+        variant data. Product cards in the widget are built by AskRAG from the live
+        MCP payload.
+    </p>
+
+    <h3>Promotion Questions</h3>
+    <p>
+        The MCP promotion tool returns public promotion summaries. Coupon codes are
+        only shown when the code appears in the Public Chat Coupon Codes allow-list.
+        Catalog discounts already reflected in product final prices are not added a
+        second time.
+    </p>
+
+    <h3>Logged-In Customer Order Status</h3>
+    <p>
+        Logged-in customers can ask about their own orders. Magento issues a
+        short-lived same-origin customer assertion from
+        <code>/commerce-mcp/customer/assertion</code>. AskRAG uses the assertion to
+        call <code>get_order_status</code>. The response excludes billing address,
+        shipping address, email, telephone, payment details, invoices, credit memos,
+        and internal comments.
+    </p>
+
+    <h3>Guest Order Verification</h3>
+    <p>
+        Guests see a compact widget verification form. The form asks for order
+        number and billing email or phone. That verification data is posted to the
+        backend verification endpoint and is not sent through normal chat text or
+        included in an LLM prompt.
+    </p>
+    <div class="warning">
+        Failed guest checks return a generic message so order numbers cannot be
+        enumerated. Repeated failures are subject to order-status rate limits.
+    </div>
+
+    <h2>10. Security and Privacy Boundaries</h2>
+    <ul>
+        <li>All MCP tools are read-only.</li>
+        <li>Public product and promotion tools return storefront-visible data.</li>
+        <li>Product cost, source-level warehouse quantities, admin records, customer lookup, arbitrary order search, payment data, and write operations are not exposed.</li>
+        <li>Browser-provided customer IDs, emails, and login flags do not authorize customer-specific data.</li>
+        <li>Logged-in customer order status requires a Magento-issued assertion.</li>
+        <li>Guest order verification requires order number plus billing email or phone.</li>
+        <li>Access tokens are shown once and stored hashed.</li>
+        <li>Correlation IDs are used for troubleshooting without logging secrets.</li>
+        <li>Do not place MCP tokens in browser JavaScript, public HTML, logs, screenshots, or ticket comments.</li>
+    </ul>
+
+    <h2>11. Troubleshooting</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Symptom</th>
+                <th>Check</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Endpoint returns disabled or unavailable response.</td>
+                <td>Confirm Enable MCP Endpoint is set to Yes and run <code>php bin/magento cache:clean config</code>.</td>
+            </tr>
+            <tr>
+                <td>Authentication fails.</td>
+                <td>Confirm the token was copied exactly, has not expired, and has not been revoked or rotated.</td>
+            </tr>
+            <tr>
+                <td>Store context fails.</td>
+                <td>Confirm the requested store code is active and listed in Allowed Store Codes.</td>
+            </tr>
+            <tr>
+                <td>Product card has no image.</td>
+                <td>Confirm the product has a storefront-visible base image or gallery image for the selected store view.</td>
+            </tr>
+            <tr>
+                <td>Price or stock differs from expectations.</td>
+                <td>Confirm the selected store view, website, currency, catalog price rules, and MSI salability configuration.</td>
+            </tr>
+            <tr>
+                <td>Coupon code is not shown.</td>
+                <td>Add only public, approved coupon codes to Public Chat Coupon Codes and clear config cache.</td>
+            </tr>
+            <tr>
+                <td>Logged-in order status fails.</td>
+                <td>Confirm the customer is logged in to the same Magento store and the assertion endpoint is reachable from the browser.</td>
+            </tr>
+            <tr>
+                <td>Guest order verification fails.</td>
+                <td>Confirm the order number and billing email or phone match the order and store view.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>12. Upgrade and Maintenance</h2>
+    <ol>
+        <li>Back up the Magento codebase and database according to store policy.</li>
+        <li>Update the package through Composer.</li>
+        <li>Run <code>php bin/magento setup:upgrade</code>.</li>
+        <li>Run production compile and static-content deployment when required.</li>
+        <li>Run <code>php bin/magento cache:clean</code>.</li>
+        <li>Run the AskRAG MCP health check.</li>
+        <li>Review token age and rotate tokens when operational policy requires it.</li>
+    </ol>
+    <p>
+        Data patches backfill newly approved read-only tools into the default read-only
+        role. If a role was manually customized, review allowed tools after upgrade.
+    </p>
+
+    <h2>13. Manual Verification Checklist</h2>
+    <ul>
+        <li>Module installs with Composer and <code>setup:upgrade</code>.</li>
+        <li>Magento compiles in production mode.</li>
+        <li>Endpoint remains disabled until configured.</li>
+        <li>Allowed store codes reject unapproved store codes.</li>
+        <li>Client token can be created, rotated, and revoked.</li>
+        <li>Health check succeeds for the configured AskRAG tenant.</li>
+        <li>Product cards show current price, stock status, image, URL, and variants where applicable.</li>
+        <li>Promotion questions show only public promotion details and approved coupon codes.</li>
+        <li>Logged-in customer can retrieve only their own order status.</li>
+        <li>Guest order verification works with matching order number and billing email or phone.</li>
+        <li>Failed order verification does not disclose whether the order number exists.</li>
+        <li>Logs do not contain MCP tokens, assertions, billing email, phone, addresses, or payment data.</li>
+    </ul>
+
+    <h2>14. Support Information</h2>
+    <p>
+        For operational issues, collect the Magento version, PHP version, module
+        version, store code, AskRAG tenant slug, MCP health-check output, and the
+        Magento correlation ID from the failing request. Do not include access
+        tokens, customer assertions, billing email, phone numbers, addresses, or
+        payment details in support notes.
+    </p>
+</body>
+</html>

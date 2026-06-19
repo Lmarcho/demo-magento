@@ -13,8 +13,22 @@ Marketplace.
   `Lmarcho\\CommerceMcp\\`.
 - `registration.php` registers `Lmarcho_CommerceMcp`.
 - `etc/module.xml` declares required Magento module sequence dependencies.
-- The Marketplace listing license must match the Composer `license` value or a
-  documented custom license in the Marketplace portal.
+- Primary distribution target is Adobe Commerce Marketplace / `repo.magento.com`,
+  not Packagist.
+- Keep the Composer `version` field in Marketplace ZIP releases. The package
+  artifact is uploaded as a fixed release, and the ZIP filename, `composer.json`
+  version, server `serverInfo.version`, setup docs, and release notes must all
+  match.
+- If the same package is later published to Packagist from a VCS repository,
+  remove the Composer `version` field on that branch and use Git tags as the
+  source of truth.
+- The current license policy is commercial/proprietary. Keep
+  `"license": "proprietary"` unless legal approves an open-source license.
+- The Marketplace listing license/EULA must match the Composer `license` value
+  or a documented custom license in the Marketplace portal.
+- Do not add a placeholder open-source `LICENSE` file. If legal approves an
+  open-source release, change Composer `license` to the approved SPDX identifier
+  and add the matching `LICENSE` file in the same release.
 
 ## Documentation Required for Review
 
@@ -22,12 +36,15 @@ Commerce Marketplace technical review expects installation and usage
 documentation. Use these files as the source for the PDF documentation uploaded
 in the Developer Portal:
 
+- `docs/COMMERCE_MCP_USER_GUIDE.pdf`: customer-facing user guide for Marketplace
+  manual QA upload.
+- `docs/COMMERCE_MCP_USER_GUIDE.html`: editable source for the PDF user guide.
 - `README.md`: module summary, installation, client commands, and tests.
 - `docs/ORDER_TOOLS_SETUP.md`: order status and guest verification setup.
 - `docs/IMPLEMENTATION_NOTES.md`: implementation decisions and security notes.
 
-Prepare at least one customer-facing user guide PDF under the Marketplace size
-limit. Include:
+The customer-facing user guide PDF must remain under the Marketplace size limit
+and include:
 
 - installation commands
 - admin configuration fields
@@ -86,7 +103,8 @@ The package must include:
 - `Console/`
 - `Setup/`
 - `view/`
-- customer-facing docs
+- `docs/COMMERCE_MCP_USER_GUIDE.pdf`
+- customer-facing docs and operational setup notes
 
 Exclude:
 
